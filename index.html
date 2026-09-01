@@ -1,100 +1,45 @@
-import logging
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+import random
 
-# إعداد السجلات لمتابعة الأخطاء
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
 
-# قائمة الولايات والخدمات
-WILAYAS = {
-    "bouira": "البويرة",
-    "algiers": "الجزائر العاصمة",
-    "oran": "وهران",
-    "tizi": "تيزي وزو",
-    "bejaia": "بجاية
-}
+def start_game():
+    print("=" * 40)
+    print("   مرحباً بك في لعبة تخمين الرقم!   ")
+    print("=" * 40)
+    print("لقد اخترت رقماً بين 1 و 100. هل يمكنك تخمينه؟")
 
-SERVICES = [
-    ("خدمات منزلية (كهرباء/سباكة)", "home"),
-    ("نقل وتوصيل البضائع", "transport"),
-    ("صيانة وتصليح", "repair"),
-    ("خدمات أخرى", "other")
-]
+    # اختيار رقم عشوائي
+    secret_number = random.randint(1, 100)
+    attempts = 0
+    max_attempts = 7
 
-# أمر /start
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
-        [InlineKeyboardButton(name, callback_data=f"wilaya:{code}")]
-        for code, name in WILAYAS.items()
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    welcome_text = "مرحباً بك في بوت الخدمات الجزائرية! 🇩🇿\nالرجاء اختيار الولاية:"
-    
-    if update.message:
-        await update.message.reply_text(welcome_text, reply_markup=reply_markup)
-    elif update.callback_query:
-        await update.callback_query.edit_message_text(welcome_text, reply_markup=reply_markup)
+    while attempts < max_attempts:
+        try:
+            guess = int(
+                input(
+                    f"\nالمحاولة ({attempts + 1}/{max_attempts}) - أدخل رقمك: "
+                )
+            )
+        except ValueError:
+            print("عذراً، يرجى إدخال رقم صحيح فقط!")
+            continue
 
-# معالجة الضغط على الأزرار
-async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-    data = query.data
+        attempts += 1
 
-    # اختيار الولاية -> عرض قائمة الخدمات
-    if data.startswith("wilaya:"):
-        wilaya_code = data.split(":")[1]
-        wilaya_name = WILAYAS.get(wilaya_code, "")
-        
-        keyboard = [
-            [InlineKeyboardButton(serv_name, callback_data=f"service:{wilaya_code}:{serv_code}")]
-            for serv_name, serv_code in SERVICES
-        ]
-        keyboard.append([InlineKeyboardButton("⬅️ العودة للقائمة الرئيسية", callback_data="main_menu")])
-        
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(
-            f"اخترت ولاية: **{wilaya_name}**\nاختر نوع الخدمة التي تبحث عنها:",
-            reply_markup=reply_markup,
-            parse_mode="Markdown"
+        if guess < secret_number:
+            print("❌ الرقم الصغير جداً! حاول برقم أكبر.")
+        elif guess > secret_number:
+            print("❌ الرقم كبير جداً! حاول برقم أصغر.")
+        else:
+            print(
+                f"\n🎉 مبروك! لقد حزرت الرقم الصحيح ({secret_number}) في {attempts} محاولات!"
+            )
+            break
+    else:
+        print(
+            f"\n😔 للاسف، انتهت محاولاتك! الرقم الصحيح كان: {secret_number}"
         )
 
-    # اختيار الخدمة -> عرض النتيجة
-    elif data.startswith("service:"):
-        _, wilaya_code, serv_code = data.split(":")
-        wilaya_name = WILAYAS.get(wilaya_code)
-        
-        keyboard = [
-            [InlineKeyboardButton("⬅️ العودة للولايات", callback_data="main_menu")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        await query.edit_message_text(
-            f"تم تسجيل طلبك!\n📍 **الولاية:** {wilaya_name}\n🛠️ **نوع الخدمة:** {serv_code}\n\nسيرد عليك مقدمو الخدمة قريباً.",
-            reply_markup=reply_markup,
-            parse_mode="Markdown"
-        )
 
-    # العودة للقائمة الرئيسية
-    elif data == "main_menu":
-        await start(update, context)
-
-def main():
-    # ضع التوكن الخاص بك هنا
-    TOKEN = "YOUR_BOT_TOKEN_HERE"
-    
-    app = ApplicationBuilder().token(TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(button_handler))
-
-    print("البوت يعمل الآن...")
-    app.run_polling()
-
-if __name__ == '__main__':
-    main()
-    
+# تشغيل اللعبة
+start_game()
+            
