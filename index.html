@@ -3,17 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بوابة خدمات الاتصالات الجزائرية</title>
+  <title>خدمات الاتصالات والعروض</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
-      --djezzy-color: #e11d48;
-      --ooredoo-color: #dc2626;
-      --mobilis-color: #16a34a;
-      --algerie-color: #0284c7;
       --bg-color: #0f172a;
       --card-bg: #1e293b;
       --text-color: #f8fafc;
+      --accent-color: #38bdf8;
     }
 
     * {
@@ -32,272 +29,268 @@
 
     .header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .header h1 {
-      font-size: 20px;
-      color: #38bdf8;
-      margin-bottom: 6px;
+      font-size: 19px;
+      color: var(--accent-color);
+      margin-bottom: 4px;
     }
 
     .header p {
-      font-size: 13px;
+      font-size: 12px;
       color: #94a3b8;
     }
 
     /* شبكة اختيار المتعاملين */
     .operators-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
     .op-card {
       background: var(--card-bg);
-      border-radius: 14px;
-      padding: 16px;
+      border-radius: 12px;
+      padding: 10px 4px;
       text-align: center;
       border: 2px solid transparent;
       cursor: pointer;
       transition: all 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .op-card:active {
-      transform: scale(0.96);
     }
 
     .op-card.active {
-      border-color: #38bdf8;
+      border-color: var(--accent-color);
       background: #26334d;
     }
 
     .op-badge {
-      width: 45px;
-      height: 45px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 18px;
+      font-size: 14px;
       color: #fff;
-      margin-bottom: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      margin: 0 auto 6px;
     }
 
-    /* ألوان الشعارات الخاصة بالمتعاملين */
     .badge-djezzy { background: linear-gradient(135deg, #e11d48, #9f1239); }
     .badge-ooredoo { background: linear-gradient(135deg, #dc2626, #991b1b); }
     .badge-mobilis { background: linear-gradient(135deg, #16a34a, #15803d); }
     .badge-algerie { background: linear-gradient(135deg, #0284c7, #0369a1); }
 
-    .op-card h3 {
+    .op-card h4 {
+      font-size: 12px;
+    }
+
+    /* قسم العروض والهدايا */
+    .offers-section {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .offers-section h3 {
       font-size: 15px;
+      color: var(--accent-color);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .offer-item {
+      background: #0f172a;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+      border-right: 4px solid var(--accent-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .offer-info h4 {
+      font-size: 13px;
       margin-bottom: 2px;
     }
 
-    .op-card span {
+    .offer-info p {
       font-size: 11px;
       color: #94a3b8;
     }
 
-    /* نموذج تسجيل الدخول */
+    .btn-claim {
+      background: #22c55e;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* قسم إدخال الرقم للتفعيل */
     .login-section {
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      border-radius: 14px;
+      padding: 16px;
     }
 
-    .form-group {
-      margin-bottom: 14px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 13px;
-      margin-bottom: 6px;
-      color: #cbd5e1;
+    .login-section h3 {
+      font-size: 14px;
+      margin-bottom: 10px;
     }
 
     .input-field {
       width: 100%;
-      padding: 12px;
-      border-radius: 10px;
+      padding: 10px;
+      border-radius: 8px;
       border: 1px solid #334155;
       background: #0f172a;
       color: #fff;
-      font-size: 16px;
-      text-align: center;
-      outline: none;
-      letter-spacing: 1px;
-    }
-
-    .input-field:focus {
-      border-color: #38bdf8;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
       font-size: 15px;
-      font-weight: bold;
-      color: #fff;
-      cursor: pointer;
-      background: #0284c7;
-      transition: background 0.2s;
-    }
-
-    .btn-success {
-      background: #16a34a;
-    }
-
-    .btn:active {
-      opacity: 0.9;
-    }
-
-    .step-box {
-      display: none;
-    }
-
-    .step-box.active-step {
-      display: block;
-    }
-
-    .status-msg {
-      margin-top: 12px;
-      font-size: 13px;
       text-align: center;
-      color: #38bdf8;
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .btn-main {
+      width: 100%;
+      padding: 11px;
+      border-radius: 8px;
+      border: none;
+      background: #0284c7;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>📱 خدمات الشحن والاتصالات</h1>
-    <p>اختر المتعامل وسجل الدخول لربط الحساب</p>
+    <h1>📱 خدمات الاتصالات والعروض اليومية</h1>
+    <p>اختر المتعامل للاطلاع على أفضل العروض والهدايا</p>
   </div>
 
-  <!-- شبكة البطاقات والشعارات -->
   <div class="operators-grid">
-    <div class="op-card active" id="card-djezzy" onclick="selectOperator('djezzy', 'جيزي Djezzy', '07')">
+    <div class="op-card active" id="card-djezzy" onclick="switchOp('djezzy', 'جيزي')">
       <div class="op-badge badge-djezzy">Dz</div>
-      <h3>جيزي</h3>
-      <span>Djezzy App</span>
+      <h4>جيزي</h4>
     </div>
-
-    <div class="op-card" id="card-ooredoo" onclick="selectOperator('ooredoo', 'أوريدو Ooredoo', '05')">
+    <div class="op-card" id="card-ooredoo" onclick="switchOp('ooredoo', 'أوريدو')">
       <div class="op-badge badge-ooredoo">Oo</div>
-      <h3>أوريدو</h3>
-      <span>My Ooredoo</span>
+      <h4>أوريدو</h4>
     </div>
-
-    <div class="op-card" id="card-mobilis" onclick="selectOperator('mobilis', 'موبيليس Mobilis', '06')">
+    <div class="op-card" id="card-mobilis" onclick="switchOp('mobilis', 'موبيليس')">
       <div class="op-badge badge-mobilis">Mob</div>
-      <h3>موبيليس</h3>
-      <span>My Mobilis</span>
+      <h4>موبيليس</h4>
     </div>
-
-    <div class="op-card" id="card-algerie" onclick="selectOperator('algerie', 'اتصالات الجزائر', '4G/ADSL')">
+    <div class="op-card" id="card-algerie" onclick="switchOp('algerie', 'إيدوم')">
       <div class="op-badge badge-algerie">AT</div>
-      <h3>إيدوم</h3>
-      <span>Algérie Télécom</span>
+      <h4>إيدوم</h4>
     </div>
   </div>
 
-  <!-- نموذج تسجيل الدخول المرحلي -->
+  <div class="offers-section">
+    <h3 id="offersTitle">🔥 أفضل عروض وهدايا جيزي اليوم:</h3>
+    <div id="offersList">
+      </div>
+  </div>
+
   <div class="login-section">
-    
-    <!-- الخطوة الأولى: إدخال الرقم -->
-    <div id="step1" class="step-box active-step">
-      <div class="form-group">
-        <label id="phoneLabel">رقم الهاتف (جيزي):</label>
-        <input type="tel" id="phoneNumber" class="input-field" placeholder="07XXXXXXXX" maxlength="10" />
-      </div>
-      <button class="btn" onclick="requestOTP()">إرسال رمز التأكيد (SMS)</button>
-    </div>
-
-    <!-- الخطوة الثانية: إدخال رمز SMS -->
-    <div id="step2" class="step-box">
-      <div class="form-group">
-        <label>أدخل رمز التأكيد المرسل إلى هاتفك:</label>
-        <input type="number" id="otpCode" class="input-field" placeholder="XXXX" maxlength="6" />
-      </div>
-      <button class="btn btn-success" onclick="verifyOTP()">تأكيد وتسجيل الدخول</button>
-    </div>
-
-    <div id="statusMessage" class="status-msg"></div>
+    <h3>🔗 ربط حسابك لتفعيل العروض بضغطة زر</h3>
+    <input type="tel" id="phoneNumber" class="input-field" placeholder="أدخل رقم الهاتف للتفعيل" />
+    <button class="btn-main" onclick="startActivation()">تأكيد وتفعيل العروض</button>
   </div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    let currentOperator = 'djezzy';
+    // قائمة العروض لكل متعامل
+    const data = {
+      djezzy: {
+        title: "🔥 أفضل عروض وهدايا جيزي اليوم:",
+        offers: [
+          { name: "🎁 هدية اليوم (Djezzy App)", desc: "1 Go أنترنت مجاني عند تسجيل الدخول", action: "احصل عليها" },
+          { name: "⚡ عرض Djezzy Special", desc: "10 Go أنترنت + مكالمات غير محدودة بـ 1000 دج", action: "تفعيل" },
+          { name: "🚀 عرض 24 ساعة", desc: "2 Go أنترنت بـ 100 دج فقط", action: "تفعيل" }
+        ]
+      },
+      ooredoo: {
+        title: "🔥 أفضل عروض وهدايا أوريدو اليوم:",
+        offers: [
+          { name: "🎁 عجلة الحظ (My Ooredoo)", desc: "دورة يومية للحصول على أنترنت ورصيد مجاني", action: "دوران" },
+          { name: "⚡ عرض La Switch", desc: "50 Go + مكالمات بلا حدود بـ 1500 دج", action: "تفعيل" },
+          { name: "📱 عرض Yoostar", desc: "إنترنت شبكات التواصل الاجتماعي بـ 500 دج", action: "تفعيل" }
+        ]
+      },
+      mobilis: {
+        title: "🔥 أفضل عروض وهدايا موبيليس اليوم:",
+        offers: [
+          { name: "🎁 مكافأة Win Max", desc: "رصيد أنترنت إضافي عند كل تعبئة", action: "استلام" },
+          { name: "⚡ عرض Sama Pixx", desc: "50 Go + 2000 دج رصيد بـ 2000 دج", action: "تفعيل" },
+          { name: "🌐 عرض 2 Go يومي", desc: "2 Go أنترنت لمدة 24 ساعة بـ 100 دج", action: "تفعيل" }
+        ]
+      },
+      algerie: {
+        title: "🔥 عروض وتعبئة إيدوم (اتصالات الجزائر):",
+        offers: [
+          { name: "🎁 مكافأة التعبئة الإلكترونية", desc: "أيام إضافية مجانية عند الشحن أونلاين", action: "شحن" },
+          { name: "⚡ اشتراك Idoom 4G", desc: "150 Go أنترنت بـ 1500 دج/شهر", action: "تجديد" },
+          { name: "🌐 اشتراك Idoom ADSL/Fibre", desc: "سرعة تصل إلى 15 ميغا", action: "تجديد" }
+        ]
+      }
+    };
 
-    function selectOperator(op, name, prefix) {
-      currentOperator = op;
-      
-      // تحديث تمييز البطاقة المحددة
+    function switchOp(opKey, name) {
       document.querySelectorAll('.op-card').forEach(c => c.classList.remove('active'));
-      document.getElementById('card-' + op).classList.add('active');
+      document.getElementById(`card-${opKey}`).classList.add('active');
 
-      // تحديث العنوان ونوع الرقم
-      document.getElementById('phoneLabel').innerText = `رقم الحساب (${name}):`;
-      document.getElementById('phoneNumber').placeholder = prefix.startsWith('0') ? `${prefix}XXXXXXXX` : 'رقم الحساب / الهاتف';
-      
-      // العودة للخطوة الأولى عند تغيير المتعامل
-      showStep(1);
-      document.getElementById('statusMessage').innerText = '';
+      const opData = data[opKey];
+      document.getElementById('offersTitle').innerText = opData.title;
+
+      let listHtml = '';
+      opData.offers.forEach(item => {
+        listHtml += `
+          <div class="offer-item">
+            <div class="offer-info">
+              <h4>${item.name}</h4>
+              <p>${item.desc}</p>
+            </div>
+            <button class="btn-claim" onclick="selectOffer('${item.name}')">${item.action}</button>
+          </div>
+        `;
+      });
+
+      document.getElementById('offersList').innerHTML = listHtml;
     }
 
-    function showStep(stepNumber) {
-      document.getElementById('step1').classList.remove('active-step');
-      document.getElementById('step2').classList.remove('active-step');
-      document.getElementById(`step${stepNumber}`).classList.add('active-step');
+    function selectOffer(offerName) {
+      alert(`اخترت: ${offerName}\nأدخل رقم هاتفك بالأسفل لتأكيد وتفعيل العرض.`);
     }
 
-    function requestOTP() {
+    function startActivation() {
       const phone = document.getElementById('phoneNumber').value;
-      
-      if (phone.length < 8) {
-        alert('يرجى إدخال رقم هاتف صحيح');
+      if (!phone || phone.length < 8) {
+        alert('يرجى كتابة رقم هاتف صحيح أولاً');
         return;
       }
-
-      document.getElementById('statusMessage').innerText = 'جاري طلب رمز SMS من المتعامل...';
-
-      // محاكاة إرسال الرمز والانتقال للخطوة التالية
-      setTimeout(() => {
-        showStep(2);
-        document.getElementById('statusMessage').innerText = `تم إرسال الرمز إلى الرقم ${phone}`;
-      }, 1000);
+      alert(`جاري إرسال رمز SMS إلى الرقم ${phone} لتأكيد التفعيل...`);
     }
 
-    function verifyOTP() {
-      const otp = document.getElementById('otpCode').value;
-
-      if (!otp || otp.length < 4) {
-        alert('يرجى إدخال رمز التأكيد الصحيح');
-        return;
-      }
-
-      document.getElementById('statusMessage').innerText = 'جاري التحقق من الرمز...';
-
-      // محاكاة تأكيد الدخول
-      setTimeout(() => {
-        document.getElementById('statusMessage').innerText = '🎉 تم تسجيل الدخول بنجاح! الحساب مرتبط الآن.';
-      }, 1000);
-    }
+    // تحميل عروض جيزي افتراضياً عند الفتح
+    switchOp('djezzy', 'جيزي');
   </script>
 </body>
 </html>
