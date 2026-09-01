@@ -1,1 +1,223 @@
+"""
+Bot Telegram - Mise en relation Artisans / Clients (Algérie)
+================================================================
+Ce bot permet à des artisans (plombiers, électriciens, menuisiers, etc.)
+de s'inscrire, et à des clients de rechercher un artisan disponible
+dans leur wilaya.
 
+Installation :
+    pip install python-telegram-bot --upgrade
+
+Configuration :
+    1. Crée un bot via @BotFather sur Telegram et récupère le TOKEN
+    2. Remplace la valeur de BOT_TOKEN ci-dessous
+    3. Lance le script : python hirafi_bot.py
+
+Les données sont stockées dans un fichier JSON local (artisans.json).
+Pour un usage à grande échelle, il faudra migrer vers une vraie base
+de données (PostgreSQL, SQLite, etc.).
+"""
+
+import json
+import logging
+import os
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ConversationHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
+
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+)
+logger = logging.getLogger(__name__)
+
+# ============ CONFIGURATION ============
+BOT_TOKEN = "REMPLACE_MOI_PAR_TON_TOKEN"
+DATA_FILE = "artisans.json"
+
+METIERS = ["سباك", "كهربائي", "نجار", "بويّة", "ميكانيسيان", "آخر"]
+WILAYAS = [
+    "الجزائر العاصمة", "وهران", "قسنطينة", "عنابة", "سطيف",
+    "بليدة", "تلمسان", "باتنة", "بجاية", "أخرى",
+]
+
+# ============ ETATS DE LA CONVERSATION ============
+(
+    CHOOSING_ROLE,
+    ARTISAN_METIER,
+    ARTISAN_WILAYA,
+    ARTISAN_PHONE,
+    ARTISAN_NAME,
+    CLIENT_METIER,
+    CLIENT_WILAYA,
+) = range(7)
+
+
+# ============ STOCKAGE (JSON simple) ============
+def load_data() -> list:
+    if not os.path.exists(DATA_FILE):
+        return []
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_artisan(entry: dict) -> None:
+    data = load_data()
+    data.append(entry)
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def find_artisans(metier: str, wilaya: str) -> list:
+    data = load_data()
+    return [
+        a for a in data
+        if a["metier"] == metier and a["wilaya"] == wilaya
+    ]
+
+
+def build_keyboard(options: list) -> ReplyKeyboardMarkup:
+    keyboard = [[o] for o in options]
+    return ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
+
+
+# ============ HANDLERS ============
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    keyboard = build_keyboard(["🔧 أنا حرفي", "🔍 نبحث عن خدمة"])
+    await update.message.reply_text(
+        "أهلاً بيك! وش أنت؟",
+        reply_markup=keyboard,
+    )
+    return CHOOSING_ROLE
+
+
+async def choose_role(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    text = update.message.text
+    if "حرفي" in text:
+        await update.message.reply_text(
+            "وش مهنتك؟",
+            reply_markup=build_keyboard(METIERS),
+        )
+        return ARTISAN_METIER
+    else:
+        await update.message.reply_text(
+            "وش نوع الخدمة تحتاجها؟",
+            reply_markup=build_keyboard(METIERS),
+        )
+        return CLIENT_METIER
+
+
+# ----- Parcours ARTISAN -----
+async def artisan_metier(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data["metier"] = update.message.text
+    await update.message.reply_text(
+        "في أي ولاية تخدم؟",
+        reply_markup=build_keyboard(WILAYAS),
+    )
+    return ARTISAN_WILAYA
+
+
+async def artisan_wilaya(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data["wilaya"] = update.message.text
+    await update.message.reply_text(
+        "أعطيني رقم هاتفك:",
+        reply_markup=ReplyKeyboardRemove(),
+    )
+    return ARTISAN_PHONE
+
+
+async def artisan_phone(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data["phone"] = update.message.text
+    await update.message.reply_text("وش اسمك (أو اسم المحل)؟")
+    return ARTISAN_NAME
+
+
+async def artisan_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data["name"] = update.message.text
+    entry = {
+        "telegram_id": update.effective_user.id,
+        "name": context.user_data["name"],
+        "metier": context.user_data["metier"],
+        "wilaya": context.user_data["wilaya"],
+        "phone": context.user_data["phone"],
+    }
+    save_artisan(entry)
+    await update.message.reply_text(
+        "✅ تسجلت بنجاح! راح نوصلك بالزبائن قريبًا.\n"
+        "اكتب /start إذا حبيت تبدأ من جديد."
+    )
+    return ConversationHandler.END
+
+
+# ----- Parcours CLIENT -----
+async def client_metier(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data["metier"] = update.message.text
+    await update.message.reply_text(
+        "في أي ولاية؟",
+        reply_markup=build_keyboard(WILAYAS),
+    )
+    return CLIENT_WILAYA
+
+
+async def client_wilaya(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    wilaya = update.message.text
+    metier = context.user_data["metier"]
+    results = find_artisans(metier, wilaya)
+
+    if not results:
+        await update.message.reply_text(
+            f"للأسف ما لقيتش {metier} مسجل في {wilaya} حاليًا. "
+            "جرب ولاية ثانية أو عاود بعد شوي.",
+            reply_markup=ReplyKeyboardRemove(),
+        )
+    else:
+        lines = [f"لقيت {len(results)} في {wilaya}:\n"]
+        for a in results:
+            lines.append(f"👤 {a['name']} - 📞 {a['phone']}")
+        await update.message.reply_text(
+            "\n".join(lines),
+            reply_markup=ReplyKeyboardRemove(),
+        )
+    return ConversationHandler.END
+
+
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text(
+        "تم الإلغاء. اكتب /start إذا حبيت تبدأ من جديد.",
+        reply_markup=ReplyKeyboardRemove(),
+    )
+    return ConversationHandler.END
+
+
+# ============ MAIN ============
+def main() -> None:
+    app = Application.builder().token(BOT_TOKEN).build()
+
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", start)],
+        states={
+            CHOOSING_ROLE: [MessageHandler(filters.TEXT & ~filters.COMMAND, choose_role)],
+            ARTISAN_METIER: [MessageHandler(filters.TEXT & ~filters.COMMAND, artisan_metier)],
+            ARTISAN_WILAYA: [MessageHandler(filters.TEXT & ~filters.COMMAND, artisan_wilaya)],
+            ARTISAN_PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, artisan_phone)],
+            ARTISAN_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, artisan_name)],
+            CLIENT_METIER: [MessageHandler(filters.TEXT & ~filters.COMMAND, client_metier)],
+            CLIENT_WILAYA: [MessageHandler(filters.TEXT & ~filters.COMMAND, client_wilaya)],
+        },
+        fallbacks=[CommandHandler("cancel", cancel)],
+    )
+
+    app.add_handler(conv_handler)
+
+    logger.info("Bot démarré...")
+    app.run_polling()
+
+
+if __name__ == "__main__":
+    main()
