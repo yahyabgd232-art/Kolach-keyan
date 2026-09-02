@@ -88,7 +88,7 @@
       font-size: 11px;
     }
 
-    /* بطاقة الرصيد (تبقى 0.00 إلى حين الربط الحقيقي) */
+    /* بطاقة الرصيد */
     .balance-card {
       background: linear-gradient(135deg, #1e293b, #0f172a);
       border: 1px solid #334155;
@@ -268,7 +268,7 @@
     </div>
   </div>
 
-  <!-- بطاقة الرصيد (تبقى 0.00 طالما لم نربط الحساب بسيرفر) -->
+  <!-- بطاقة الرصيد -->
   <div class="balance-card">
     <div class="balance-box">
       <div class="balance-title" id="title1">💰 رصيد الحساب</div>
@@ -288,14 +288,14 @@
     <div id="offersList"></div>
   </div>
 
-  <!-- القسم التفاعلي المتبدل بنفس الخانة -->
+  <!-- القسم التفاعلي المتبدل -->
   <div class="login-section" id="actionSection"></div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // حالة إدخال الرقم لكل متعامل (0: ادخل الرقم, 1: ادخل الكود)
+    // حالة إدخال الرقم لكل متعامل
     let stepState = {
       djezzy: { step: 0, phone: '' },
       ooredoo: { step: 0, phone: '' }
@@ -325,7 +325,7 @@
       algerie: {
         title: "🌐 تعبئة مودام إيدوم (Idoom 4G / ADSL):",
         offers: [
-          { name: "💳 بطاقات التعبئة", desc: "شحن اشتراك المودام باستخدام كارت التعبئة", action: "تعبئة" },
+          { name: "💳 بطاقات التعبئة", desc: "شحن اشتراك المودام باستخدام كارت التعبئة الورقية", action: "تعبئة" },
           { name: "🎁 أيام مجانية", desc: "احصل على هدايا وأيام إضافية عند التعبئة قبل انتهاء الاشتراك", action: "تفاصيل" }
         ]
       }
@@ -338,7 +338,6 @@
       document.querySelectorAll('.op-card').forEach(c => c.classList.remove('active'));
       document.getElementById(`card-${opKey}`).classList.add('active');
 
-      // العناوين والرصيد
       if (opKey === 'flexy') {
         document.getElementById('title1').innerText = "💰 تحويل الرصيد";
         document.getElementById('title2').innerText = "🌐 نوع الخدمة";
@@ -362,7 +361,6 @@
         document.getElementById('statusTag2').innerText = "(غير مربوط)";
       }
 
-      // عرض قائمة الهدايا والعروض
       const opOffers = offersData[opKey];
       document.getElementById('offersTitle').innerText = opOffers.title;
 
@@ -380,7 +378,6 @@
       });
       document.getElementById('offersList').innerHTML = listHtml;
 
-      // تحديث خانة الإدخال السفلي
       renderActionSection();
     }
 
@@ -409,11 +406,9 @@
         return;
       }
 
-      // جيزي أو أوريدو (تبديل الخانات بنفس المكان)
       const currentState = stepState[currentOp];
 
       if (currentState.step === 0) {
-        // المرحلة الأولى: إدخال الرقم
         actionSec.innerHTML = `
           <h3>📲 أدخل رقم الهاتف لمعرفة رصيدك</h3>
           <p>أدخل رقمك ليتم إرسال رمز التأكيد ومعرفة رصيدك الحقيقي</p>
@@ -421,7 +416,6 @@
           <button class="btn-main" onclick="sendPhone()">إرسال وتأكيد الرقم</button>
         `;
       } else {
-        // المرحلة الثانية: تتغير الخانة في نفس المكان لكتابة الكود
         actionSec.innerHTML = `
           <h3>📩 أدخل رمز التأكيد (SMS)</h3>
           <p>يرجى إرسال الكود الذي وصلك إلى رقم هاتفك (<b>${currentState.phone}</b>)</p>
@@ -439,7 +433,7 @@
         return;
       }
       stepState[currentOp].phone = phoneInput;
-      stepState[currentOp].step = 1; // الانتقال لمرحلة الكود
+      stepState[currentOp].step = 1;
       renderActionSection();
     }
 
@@ -491,7 +485,6 @@
       alert(`جاري تحويل ${amount} دج إلى الرقم ${friendPhone}...`);
     }
 
-    // التشغيل المبدئي عند الفتح
     switchOp('djezzy');
   </script>
 </body>
