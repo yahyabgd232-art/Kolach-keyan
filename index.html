@@ -11,6 +11,8 @@
       --card-bg: #1e293b;
       --text-color: #f8fafc;
       --accent-color: #38bdf8;
+      --error-color: #ef4444;
+      --success-color: #22c55e;
     }
 
     * {
@@ -199,17 +201,41 @@
       margin-bottom: 12px;
     }
 
+    .input-wrapper {
+      margin-bottom: 10px;
+      position: relative;
+    }
+
     .input-field {
       width: 100%;
       padding: 10px;
       border-radius: 8px;
-      border: 1px solid #334155;
+      border: 2px solid #334155;
       background: #0f172a;
       color: #fff;
       font-size: 13px;
       text-align: center;
-      margin-bottom: 10px;
       outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    /* تغيير ألوان الإدخال عند الخطأ والنجاح */
+    .input-field.input-error {
+      border-color: var(--error-color) !important;
+    }
+
+    .input-field.input-success {
+      border-color: var(--success-color) !important;
+    }
+
+    /* نص التنبيه باللون الأحمر */
+    .error-msg {
+      color: var(--error-color);
+      font-size: 11px;
+      text-align: center;
+      margin-top: 5px;
+      display: none;
+      font-weight: 500;
     }
 
     .btn-main {
@@ -295,7 +321,6 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // حالة إدخال الرقم لكل متعامل
     let stepState = {
       djezzy: { step: 0, phone: '' },
       ooredoo: { step: 0, phone: '' }
@@ -388,8 +413,14 @@
         actionSec.innerHTML = `
           <h3>💸 تحويل فليكسي إلى صديق</h3>
           <p>أدخل رقم المستلم والمبلغ المراد تحويله</p>
-          <input type="tel" id="friendPhone" class="input-field" placeholder="رقم هاتف الصديق (07/05/06)" />
-          <input type="number" id="flexyAmount" class="input-field" placeholder="المبلغ بالدينار (مثلاً 100)" />
+          <div class="input-wrapper">
+            <input type="tel" id="friendPhone" class="input-field" placeholder="رقم هاتف الصديق (07/05/06)" oninput="clearError('friendPhone', 'friendPhoneErr')" />
+            <div class="error-msg" id="friendPhoneErr">رقم الهاتف الذي قمت بكتابته خاطئ</div>
+          </div>
+          <div class="input-wrapper">
+            <input type="number" id="flexyAmount" class="input-field" placeholder="المبلغ بالدينار (مثلاً 100)" oninput="clearError('flexyAmount', 'flexyAmountErr')" />
+            <div class="error-msg" id="flexyAmountErr">يرجى كتابة مبلغ صحيح (أدنى حد 50 دج)</div>
+          </div>
           <button class="btn-main btn-flexy" onclick="sendFlexy()">إرسال الرصيد الآن</button>
         `;
         return;
@@ -399,8 +430,14 @@
         actionSec.innerHTML = `
           <h3>💳 تعبئة مودام إيدوم بكارت الشحن</h3>
           <p>أدخل رقم حساب المودام والرقم السري لكارت التعبئة</p>
-          <input type="number" id="modemNumber" class="input-field" placeholder="رقم المودام / خط إيدوم (10 أرقام)" />
-          <input type="number" id="cardRecharge" class="input-field" placeholder="الرقم السري لكارت التعبئة (16 رقم)" />
+          <div class="input-wrapper">
+            <input type="number" id="modemNumber" class="input-field" placeholder="رقم المودام / خط إيدوم (10 أرقام)" oninput="clearError('modemNumber', 'modemErr')" />
+            <div class="error-msg" id="modemErr">رقم المودام الذي قمت بكتابته خاطئ</div>
+          </div>
+          <div class="input-wrapper">
+            <input type="number" id="cardRecharge" class="input-field" placeholder="الرقم السري لكارت التعبئة (16 رقم)" oninput="clearError('cardRecharge', 'cardErr')" />
+            <div class="error-msg" id="cardErr">الرقم السري للبطاقة يجب أن يتكون من 16 رقم</div>
+          </div>
           <button class="btn-main" onclick="rechargeModem()">تعبئة المودام الآن</button>
         `;
         return;
@@ -412,35 +449,63 @@
         actionSec.innerHTML = `
           <h3>📲 أدخل رقم الهاتف لمعرفة رصيدك</h3>
           <p>أدخل رقمك ليتم إرسال رمز التأكيد ومعرفة رصيدك الحقيقي</p>
-          <input type="tel" id="userPhone" class="input-field" placeholder="أدخل رقم الهاتف (07/05/06)" />
+          <div class="input-wrapper">
+            <input type="tel" id="userPhone" class="input-field" placeholder="أدخل رقم الهاتف (07/05/06)" oninput="clearError('userPhone', 'phoneErr')" />
+            <div class="error-msg" id="phoneErr">رقم الهاتف الذي قمت بكتابته خاطئ</div>
+          </div>
           <button class="btn-main" onclick="sendPhone()">إرسال وتأكيد الرقم</button>
         `;
       } else {
         actionSec.innerHTML = `
           <h3>📩 أدخل رمز التأكيد (SMS)</h3>
           <p>يرجى إرسال الكود الذي وصلك إلى رقم هاتفك (<b>${currentState.phone}</b>)</p>
-          <input type="number" id="smsCode" class="input-field" placeholder="أدخل الكود هنا (مثلاً 1234)" />
+          <div class="input-wrapper">
+            <input type="number" id="smsCode" class="input-field" placeholder="أدخل الكود هنا (مثلاً 1234)" oninput="clearError('smsCode', 'codeErr')" />
+            <div class="error-msg" id="codeErr">رمز التأكيد الذي قمت بكتابته خاطئ</div>
+          </div>
           <button class="btn-main" onclick="verifyCode()">تأكيد وربط الحساب</button>
           <button class="btn-link" onclick="resetStep()">تغيير رقم الهاتف</button>
         `;
       }
     }
 
+    // دالة التحقق من صحة أرقام الهواتف الجزائرية
+    function isValidDzPhone(phone) {
+      const regex = /^(05|06|07)[0-9]{8}$/;
+      return regex.test(phone);
+    }
+
+    function showError(inputId, errId) {
+      const input = document.getElementById(inputId);
+      const err = document.getElementById(errId);
+      input.classList.remove('input-success');
+      input.classList.add('input-error');
+      err.style.display = 'block';
+    }
+
+    function clearError(inputId, errId) {
+      const input = document.getElementById(inputId);
+      const err = document.getElementById(errId);
+      input.classList.remove('input-error');
+      err.style.display = 'none';
+    }
+
     function sendPhone() {
-      const phoneInput = document.getElementById('userPhone').value;
-      if (!phoneInput || phoneInput.length < 9) {
-        alert('يرجى كتابة رقم هاتف صحيح متكون من 10 أرقام');
+      const phoneInput = document.getElementById('userPhone').value.trim();
+      if (!isValidDzPhone(phoneInput)) {
+        showError('userPhone', 'phoneErr');
         return;
       }
+      document.getElementById('userPhone').classList.add('input-success');
       stepState[currentOp].phone = phoneInput;
       stepState[currentOp].step = 1;
       renderActionSection();
     }
 
     function verifyCode() {
-      const codeInput = document.getElementById('smsCode').value;
+      const codeInput = document.getElementById('smsCode').value.trim();
       if (!codeInput || codeInput.length < 4) {
-        alert('يرجى إدخال كود SMS بشكل صحيح');
+        showError('smsCode', 'codeErr');
         return;
       }
       alert("جاري التحقق من الكود لاتصالك بالسيرفر وقراءة الرصيد الحقيقي...");
@@ -452,18 +517,22 @@
     }
 
     function rechargeModem() {
-      const modemNum = document.getElementById('modemNumber').value;
-      const cardNum = document.getElementById('cardRecharge').value;
+      const modemNum = document.getElementById('modemNumber').value.trim();
+      const cardNum = document.getElementById('cardRecharge').value.trim();
 
-      if (!modemNum || modemNum.length < 8) {
-        alert('يرجى إدخال رقم حساب المودام بشكل صحيح');
-        return;
+      let valid = true;
+      if (!modemNum || modemNum.length < 9) {
+        showError('modemNumber', 'modemErr');
+        valid = false;
       }
-      if (!cardNum || cardNum.length < 10) {
-        alert('يرجى إدخال الرقم السري لكارت التعبئة المكون من 16 رقم');
-        return;
+      if (!cardNum || cardNum.length !== 16) {
+        showError('cardRecharge', 'cardErr');
+        valid = false;
       }
-      alert(`جاري شحن المودام رقم (${modemNum}) باستخدام الكارت...`);
+
+      if (valid) {
+        alert(`جاري شحن المودام رقم (${modemNum}) باستخدام الكارت...`);
+      }
     }
 
     function selectOffer(offerName) {
@@ -471,21 +540,26 @@
     }
 
     function sendFlexy() {
-      const friendPhone = document.getElementById('friendPhone').value;
-      const amount = document.getElementById('flexyAmount').value;
+      const friendPhone = document.getElementById('friendPhone').value.trim();
+      const amount = document.getElementById('flexyAmount').value.trim();
 
-      if (!friendPhone || friendPhone.length < 9) {
-        alert('يرجى إدخال رقم هاتف المستلم بشكل صحيح');
-        return;
+      let valid = true;
+      if (!isValidDzPhone(friendPhone)) {
+        showError('friendPhone', 'friendPhoneErr');
+        valid = false;
       }
       if (!amount || amount < 50) {
-        alert('أدنى مبلغ للتحويل هو 50 دج');
-        return;
+        showError('flexyAmount', 'flexyAmountErr');
+        valid = false;
       }
-      alert(`جاري تحويل ${amount} دج إلى الرقم ${friendPhone}...`);
+
+      if (valid) {
+        alert(`جاري تحويل ${amount} دج إلى الرقم ${friendPhone}...`);
+      }
     }
 
     switchOp('djezzy');
   </script>
 </body>
-</html>
+  </html>
+  
