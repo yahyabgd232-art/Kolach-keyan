@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>خدمات الاتصالات والعروض</title>
+  <title>خدمات الاتصالات وتحويل الرصيد</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -29,11 +29,11 @@
 
     .header {
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .header h1 {
-      font-size: 19px;
+      font-size: 18px;
       color: var(--accent-color);
       margin-bottom: 4px;
     }
@@ -43,18 +43,18 @@
       color: #94a3b8;
     }
 
-    /* شبكة اختيار المتعاملين والخدمات */
+    /* شبكة اختيار المتعاملين */
     .operators-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .op-card {
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 10px 4px;
+      padding: 8px 4px;
       text-align: center;
       border: 2px solid transparent;
       cursor: pointer;
@@ -67,16 +67,16 @@
     }
 
     .op-badge {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
       color: #fff;
-      margin: 0 auto 6px;
+      margin: 0 auto 4px;
     }
 
     .badge-djezzy { background: linear-gradient(135deg, #e11d48, #9f1239); }
@@ -88,24 +88,69 @@
       font-size: 11px;
     }
 
-    /* قسم العروض / الخدمات */
+    /* بطاقة عرض الرصيد والإنترنت العلوية */
+    .balance-card {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .balance-box {
+      flex: 1;
+    }
+
+    .balance-box:first-child {
+      border-left: 1px solid #334155;
+    }
+
+    .balance-title {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+
+    .balance-value {
+      font-size: 16px;
+      font-weight: bold;
+      color: #38bdf8;
+    }
+
+    .balance-value.net {
+      color: #22c55e;
+    }
+
+    .status-tag {
+      display: block;
+      font-size: 9px;
+      color: #f59e0b;
+      margin-top: 2px;
+    }
+
+    /* قسم العروض */
     .offers-section {
       background: var(--card-bg);
       border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
     }
 
     .offers-section h3 {
-      font-size: 15px;
+      font-size: 14px;
       color: var(--accent-color);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .offer-item {
       background: #0f172a;
       border-radius: 10px;
-      padding: 12px;
+      padding: 10px;
       margin-bottom: 8px;
       border-right: 4px solid var(--accent-color);
       display: flex;
@@ -114,12 +159,12 @@
     }
 
     .offer-info h4 {
-      font-size: 13px;
+      font-size: 12px;
       margin-bottom: 2px;
     }
 
     .offer-info p {
-      font-size: 11px;
+      font-size: 10px;
       color: #94a3b8;
     }
 
@@ -127,7 +172,7 @@
       background: #22c55e;
       color: #fff;
       border: none;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 6px;
       font-size: 11px;
       font-weight: bold;
@@ -138,36 +183,36 @@
     .login-section {
       background: var(--card-bg);
       border-radius: 14px;
-      padding: 16px;
+      padding: 14px;
     }
 
     .login-section h3 {
-      font-size: 14px;
+      font-size: 13px;
       margin-bottom: 10px;
     }
 
     .input-field {
       width: 100%;
-      padding: 10px;
+      padding: 9px;
       border-radius: 8px;
       border: 1px solid #334155;
       background: #0f172a;
       color: #fff;
-      font-size: 14px;
+      font-size: 13px;
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       outline: none;
     }
 
     .btn-main {
       width: 100%;
-      padding: 11px;
+      padding: 10px;
       border-radius: 8px;
       border: none;
       background: #0284c7;
       color: #fff;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
     }
 
@@ -181,10 +226,10 @@
 
   <div class="header">
     <h1>📱 خدمات الاتصالات وتحويل الرصيد</h1>
-    <p>اختر الخدمة أو المتعامل للاستفادة المباشرة</p>
+    <p>اختر المتعامل لعرض رصيدك وتحويل الخدمات</p>
   </div>
 
-  <!-- شبكة الأزرار مع تعويض موبيليس بتحويل Flexy -->
+  <!-- شبكة الأزرار -->
   <div class="operators-grid">
     <div class="op-card active" id="card-djezzy" onclick="switchOp('djezzy')">
       <div class="op-badge badge-djezzy">Dz</div>
@@ -204,65 +249,102 @@
     </div>
   </div>
 
-  <!-- قسم العروض أو تعليمات تحويل الرصيد -->
-  <div class="offers-section">
-    <h3 id="offersTitle">🔥 أفضل عروض وهدايا جيزي اليوم:</h3>
-    <div id="offersList">
-      <!-- يتم التحديث عبر JavaScript -->
+  <!-- بطاقة عرض الرصيد المبدئية (تظهر 0.00 حتى يتم إدخال الرقم) -->
+  <div class="balance-card">
+    <div class="balance-box">
+      <div class="balance-title">💰 رصيد الحساب (فليكسي)</div>
+      <div class="balance-value" id="creditVal">0.00 دج</div>
+      <span class="status-tag" id="statusTag1">(يرجى ربط الرقم)</span>
+    </div>
+    <div class="balance-box">
+      <div class="balance-title">🌐 رصيد الإنترنت المتبقي</div>
+      <div class="balance-value net" id="internetVal">0.00 Go</div>
+      <span class="status-tag" id="statusTag2">(يرجى ربط الرقم)</span>
     </div>
   </div>
 
-  <!-- القسم التفاعلي (تسجيل الدخول أو تحويل الرصيد) -->
-  <div class="login-section" id="actionSection">
-    <!-- ديناميكي حسب الاختيار -->
+  <!-- قسم العروض -->
+  <div class="offers-section">
+    <h3 id="offersTitle">🔥 أفضل عروض وهدايا جيزي اليوم:</h3>
+    <div id="offersList"></div>
   </div>
+
+  <!-- القسم التفاعلي -->
+  <div class="login-section" id="actionSection"></div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    const data = {
+    // حالات التسجيل لكل متعامل
+    let userSessions = {
+      djezzy: { isLinked: false, credit: "0.00 دج", internet: "0.00 Go" },
+      ooredoo: { isLinked: false, credit: "0.00 دج", internet: "0.00 Go" },
+      algerie: { isLinked: false, credit: "0.00 دج", internet: "0.00 Go" }
+    };
+
+    const offersData = {
       djezzy: {
         title: "🔥 أفضل عروض وهدايا جيزي اليوم:",
         offers: [
           { name: "🎁 هدية اليوم (Djezzy App)", desc: "1 Go أنترنت مجاني عند تسجيل الدخول", action: "احصل عليها" },
-          { name: "⚡ عرض Djezzy Special", desc: "10 Go أنترنت + مكالمات غير محدودة بـ 1000 دج", action: "تفعيل" },
-          { name: "🚀 عرض 24 ساعة", desc: "2 Go أنترنت بـ 100 دج فقط", action: "تفعيل" }
+          { name: "⚡ عرض Djezzy Special", desc: "10 Go أنترنت + مكالمات غير محدودة بـ 1000 دج", action: "تفعيل" }
         ]
       },
       ooredoo: {
         title: "🔥 أفضل عروض وهدايا أوريدو اليوم:",
         offers: [
           { name: "🎁 عجلة الحظ (My Ooredoo)", desc: "دورة يومية للحصول على أنترنت ورصيد مجاني", action: "دوران" },
-          { name: "⚡ عرض La Switch", desc: "50 Go + مكالمات بلا حدود بـ 1500 دج", action: "تفعيل" },
-          { name: "📱 عرض Yoostar", desc: "إنترنت شبكات التواصل الاجتماعي بـ 500 دج", action: "تفعيل" }
+          { name: "⚡ عرض La Switch", desc: "50 Go + مكالمات بلا حدود بـ 1500 دج", action: "تفعيل" }
         ]
       },
       flexy: {
         title: "💸 تحويل الرصيد P2P (من صديق إلى صديق):",
         offers: [
-          { name: "📲 تحويل فليكسي سريع", desc: "أرسل رصيدك لأي صديق فوراً بدون تعقيدات", action: "تحويل" },
-          { name: "🔒 خدمة آمنة 100%", desc: "تتم العملية بأكواد الرسمية المباشرة للمتعامل", action: "معلومات" }
+          { name: "📲 تحويل فليكسي سريع", desc: "أرسل رصيدك لأي صديق فوراً بدون تعقيدات", action: "تحويل" }
         ]
       },
       algerie: {
         title: "🔥 عروض وتعبئة إيدوم (اتصالات الجزائر):",
         offers: [
-          { name: "🎁 مكافأة التعبئة الإلكترونية", desc: "أيام إضافية مجانية عند الشحن أونلاين", action: "شحن" },
-          { name: "⚡ اشتراك Idoom 4G", desc: "150 Go أنترنت بـ 1500 دج/شهر", action: "تجديد" }
+          { name: "🎁 مكافأة التعبئة الإلكترونية", desc: "أيام إضافية مجانية عند الشحن أونلاين", action: "شحن" }
         ]
       }
     };
 
+    let currentOp = 'djezzy';
+
     function switchOp(opKey) {
+      currentOp = opKey;
       document.querySelectorAll('.op-card').forEach(c => c.classList.remove('active'));
       document.getElementById(`card-${opKey}`).classList.add('active');
 
-      const opData = data[opKey];
-      document.getElementById('offersTitle').innerText = opData.title;
+      // تحديث بطاقة الرصيد
+      if (opKey === 'flexy') {
+        document.getElementById('creditVal').innerText = "رصيد جاهز";
+        document.getElementById('internetVal').innerText = "خدمة P2P";
+        document.getElementById('statusTag1').innerText = "تحويل مباشر";
+        document.getElementById('statusTag2').innerText = "بين الأصدقاء";
+      } else {
+        const session = userSessions[opKey];
+        document.getElementById('creditVal').innerText = session.credit;
+        document.getElementById('internetVal').innerText = session.internet;
+        
+        if (session.isLinked) {
+          document.getElementById('statusTag1').innerText = "✅ حساب مربوط";
+          document.getElementById('statusTag2').innerText = "✅ حساب مربوط";
+        } else {
+          document.getElementById('statusTag1').innerText = "(يرجى ربط الرقم)";
+          document.getElementById('statusTag2').innerText = "(يرجى ربط الرقم)";
+        }
+      }
+
+      // تحديث قائمة العروض
+      const opOffers = offersData[opKey];
+      document.getElementById('offersTitle').innerText = opOffers.title;
 
       let listHtml = '';
-      opData.offers.forEach(item => {
+      opOffers.offers.forEach(item => {
         listHtml += `
           <div class="offer-item">
             <div class="offer-info">
@@ -275,42 +357,64 @@
       });
       document.getElementById('offersList').innerHTML = listHtml;
 
-      // تحديث خانة النموذج السفلي
+      // تحديث النموذج السفلي
       const actionSec = document.getElementById('actionSection');
       if (opKey === 'flexy') {
         actionSec.innerHTML = `
           <h3>💸 تحويل فليكسي إلى صديق</h3>
           <input type="tel" id="friendPhone" class="input-field" placeholder="رقم هاتف الصديق (07/05/06)" />
           <input type="number" id="flexyAmount" class="input-field" placeholder="المبلغ المراد تحويله (مثلاً 100 دج)" />
-          <input type="password" id="flexyPin" class="input-field" placeholder="رمز التحويل الخاص بك (PIN)" />
+          <input type="password" id="flexyPin" class="input-field" placeholder="رمز التحويل PIN" value="0000" />
           <button class="btn-main btn-flexy" onclick="sendFlexy()">إرسال الرصيد الآن</button>
         `;
       } else {
-        actionSec.innerHTML = `
-          <h3>🔗 ربط حسابك لتفعيل العروض بضغطة زر</h3>
-          <input type="tel" id="phoneNumber" class="input-field" placeholder="أدخل رقم الهاتف للتفعيل" />
-          <button class="btn-main" onclick="startActivation()">تأكيد وتفعيل العروض</button>
-        `;
+        const isLinked = userSessions[opKey].isLinked;
+        if (isLinked) {
+          actionSec.innerHTML = `
+            <h3>✅ حسابك مربوط بنجاح</h3>
+            <p style="font-size:11px; color:#94a3b8; text-align:center; margin-bottom:10px;">يمكنك الاستفادة من العروض وتحديث الرصيد في أي وقت.</p>
+            <button class="btn-main" onclick="refreshBalance()">🔄 تحديث الرصيد الآن</button>
+          `;
+        } else {
+          actionSec.innerHTML = `
+            <h3>🔗 أدخل رقم هاتفك لرؤية رصيدك الحقيقي</h3>
+            <input type="tel" id="phoneNumber" class="input-field" placeholder="أدخل رقم الهاتف (07/05/06)" />
+            <button class="btn-main" onclick="startActivation()">تأكيد وإظهار الرصيد</button>
+          `;
+        }
       }
     }
 
     function selectOffer(offerName) {
-      alert(`اخترت: ${offerName}\nيرجى استخدام نموذج الخدمة في الأسفل.`);
+      alert(`اخترت: ${offerName}\nيرجى ربط حسابك برقم الهاتف أولاً لتفعيل العرض.`);
     }
 
     function startActivation() {
       const phone = document.getElementById('phoneNumber').value;
-      if (!phone || phone.length < 8) {
+      if (!phone || phone.length < 9) {
         alert('يرجى كتابة رقم هاتف صحيح أولاً');
         return;
       }
-      alert(`جاري إرسال رمز SMS إلى الرقم ${phone} للتأكيد...`);
+      
+      // محاكاة تأكيد الحساب وتحديث البيانات
+      alert(`جاري إرسال رمز SMS إلى الرقم ${phone} لقراءة الرصيد...`);
+      
+      // تحديث حالة الحساب كأنه تم الربط (للتجربة)
+      userSessions[currentOp].isLinked = true;
+      userSessions[currentOp].credit = "1,450.00 دج";
+      userSessions[currentOp].internet = "12.5 Go";
+
+      // إعادة تحميل الواجهة للمتعامل الحالي
+      switchOp(currentOp);
+    }
+
+    function refreshBalance() {
+      alert("جاري الاتصال بالسيرفر وتحديث الرصيد الحقيقي...");
     }
 
     function sendFlexy() {
       const friendPhone = document.getElementById('friendPhone').value;
       const amount = document.getElementById('flexyAmount').value;
-      const pin = document.getElementById('flexyPin').value;
 
       if (!friendPhone || friendPhone.length < 9) {
         alert('يرجى إدخال رقم هاتف الصديق بشكل صحيح');
@@ -320,15 +424,11 @@
         alert('أدنى مبلغ للتحويل هو 50 دج');
         return;
       }
-      if (!pin) {
-        alert('يرجى إدخال رمز التحويل (PIN)');
-        return;
-      }
 
       alert(`جاري تحويل ${amount} دج إلى الرقم ${friendPhone}...`);
     }
 
-    // التحميل الافتراضي عند الفتح
+    // التحميل الافتراضي عند فتح الصفحة
     switchOp('djezzy');
   </script>
 </body>
