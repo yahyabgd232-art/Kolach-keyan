@@ -20,52 +20,44 @@
             color: var(--text);
             margin: 0;
             padding: 8px;
+            padding-bottom: 60px;
             direction: rtl;
         }
         h2 {
             text-align: center;
             color: var(--primary);
-            font-size: 18px;
-            margin: 5px 0 10px 0;
+            font-size: 16px;
+            margin: 5px 0 8px 0;
         }
         
-        /* محفظتا رأس المال والفايدة في الأعلى */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
         .wallets-container {
             display: flex;
             gap: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .wallet-box {
             flex: 1;
-            padding: 8px;
+            padding: 6px;
             border-radius: 8px;
             text-align: center;
             color: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .wallet-capital {
-            background: linear-gradient(135deg, #6c757d, #495057);
-        }
-        .wallet-profit {
-            background: linear-gradient(135deg, #28a745, #1e7e34);
-        }
-        .wallet-box span {
-            display: block;
-            font-size: 11px;
-            opacity: 0.9;
-        }
-        .wallet-box h3 {
-            margin: 3px 0 0 0;
-            font-size: 15px;
-        }
+        .wallet-capital { background: linear-gradient(135deg, #6c757d, #495057); }
+        .wallet-profit { background: linear-gradient(135deg, #28a745, #1e7e34); }
+        .wallet-box span { display: block; font-size: 10px; opacity: 0.9; }
+        .wallet-box h3 { margin: 2px 0 0 0; font-size: 14px; }
 
         .search-box {
             width: 100%;
-            padding: 8px 10px;
-            font-size: 14px;
+            padding: 7px 10px;
+            font-size: 13px;
             border: 1px solid #ced4da;
             border-radius: 6px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             box-sizing: border-box;
             outline: none;
         }
@@ -73,31 +65,26 @@
             display: flex;
             gap: 4px;
             overflow-x: auto;
-            padding-bottom: 5px;
-            margin-bottom: 8px;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
         }
         .cat-btn {
             background: #e9ecef;
             border: none;
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 12px;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             white-space: nowrap;
             color: #495057;
         }
-        .cat-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-        .products-container {
-            max-height: 40vh;
-            overflow-y: auto;
-        }
+        .cat-btn.active { background: var(--primary); color: white; }
+        
+        .products-container { max-height: 36vh; overflow-y: auto; }
         .product-card {
             background: var(--card);
-            padding: 6px 10px;
-            margin-bottom: 6px;
+            padding: 5px 8px;
+            margin-bottom: 5px;
             border-radius: 6px;
             display: flex;
             justify-content: space-between;
@@ -105,150 +92,225 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             border-right: 3px solid var(--primary);
         }
-        .product-info h4 {
-            margin: 0 0 2px 0;
-            font-size: 13px;
-        }
-        .product-info p {
-            margin: 0;
-            font-size: 11px;
-            color: #6c757d;
-        }
-        .controls {
+        .product-left {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
+        .product-icon {
+            font-size: 22px;
+            width: 32px;
+            text-align: center;
+        }
+        .product-info h4 { margin: 0 0 2px 0; font-size: 12px; }
+        .product-info p { margin: 0; font-size: 10px; color: #6c757d; }
+        .controls { display: flex; align-items: center; gap: 5px; }
         .qty-btn {
-            border: none;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            border: none; width: 24px; height: 24px; border-radius: 50%;
+            font-size: 13px; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; color: white;
         }
         .btn-plus { background-color: var(--success); }
         .btn-minus { background-color: var(--danger); }
-        .qty-btn:active { transform: scale(0.9); }
+        .qty-num { font-weight: bold; font-size: 13px; min-width: 16px; text-align: center; }
         
-        .qty-num {
-            font-weight: bold;
-            font-size: 14px;
-            min-width: 18px;
-            text-align: center;
-        }
         .cart-summary {
             background: var(--card);
-            padding: 8px 10px;
-            margin-top: 8px;
+            padding: 6px 8px;
+            margin-top: 6px;
             border-radius: 8px;
             box-shadow: 0 -1px 5px rgba(0,0,0,0.05);
         }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 3px;
-            font-size: 13px;
-        }
-        .actions-group {
-            display: flex;
-            gap: 6px;
-            margin-top: 6px;
-        }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 12px; }
+        .actions-group { display: flex; gap: 5px; margin-top: 5px; }
         .btn-checkout {
-            flex: 2;
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
+            flex: 2; background: var(--success); color: white; border: none;
+            padding: 7px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer;
         }
         .btn-reset {
-            flex: 1;
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 8px;
-            font-size: 12px;
-            border-radius: 6px;
-            cursor: pointer;
+            flex: 1; background: var(--danger); color: white; border: none;
+            padding: 7px; font-size: 11px; border-radius: 6px; cursor: pointer;
         }
+
+        .form-card {
+            background: var(--card);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-top: 10px;
+        }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 12px; margin-bottom: 3px; color: #555; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 8px; font-size: 13px;
+            border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;
+        }
+        .btn-submit {
+            width: 100%; background: var(--primary); color: white; border: none;
+            padding: 10px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #ddd;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 11px;
+            color: #6c757d;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: bold;
+            border-top: 2px solid var(--primary);
+        }
+        .nav-item span { display: block; font-size: 16px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
-    <h2>🏪 نظام الكاشي الذكي</h2>
-
-    <!-- محفظتا رأس المال والفايدة في الأعلى -->
-    <div class="wallets-container">
-        <div class="wallet-box wallet-capital">
-            <span>رأس المال</span>
-            <h3 id="wallet-cost">0 دج</h3>
+    <!-- 1. تبويب البيع -->
+    <div id="tab-sell" class="tab-content active">
+        <h2>🏪 نظام الكاشي الذكي</h2>
+        <div class="wallets-container">
+            <div class="wallet-box wallet-capital">
+                <span>رأس المال</span>
+                <h3 id="wallet-cost">0 دج</h3>
+            </div>
+            <div class="wallet-box wallet-profit">
+                <span>الفايدة الصافية</span>
+                <h3 id="wallet-profit">0 دج</h3>
+            </div>
         </div>
-        <div class="wallet-box wallet-profit">
-            <span>الفايدة الصافية</span>
-            <h3 id="wallet-profit">0 دج</h3>
+
+        <input type="text" id="searchBox" class="search-box" placeholder="🔍 ابحث عن منتج..." oninput="filterProducts()">
+
+        <div class="categories" id="categoriesContainer">
+            <button class="cat-btn active" onclick="filterCategory('الكل', this)">الكل</button>
+            <button class="cat-btn" onclick="filterCategory('مشروبات', this)">مشروبات</button>
+            <button class="cat-btn" onclick="filterCategory('مقرمشات', this)">مقرمشات</button>
+            <button class="cat-btn" onclick="filterCategory('حلويات', this)">حلويات</button>
+            <button class="cat-btn" onclick="filterCategory('ألبان', this)">ألبان</button>
+        </div>
+
+        <div class="products-container" id="productsList"></div>
+
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>مجموع الزبون (الطوطال):</span>
+                <b id="total-sell" style="color: var(--primary);">0 دج</b>
+            </div>
+            <div class="actions-group">
+                <button class="btn-reset" onclick="resetCart()">مسح السلة</button>
+                <button class="btn-checkout" onclick="checkout()">إتمام وإرسال الفاتورة 🧾</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. تبويب إضافة منتج -->
+    <div id="tab-add" class="tab-content">
+        <h2>➕ إضافة منتج جديد</h2>
+        <div class="form-card">
+            <div class="form-group">
+                <label>اسم المنتج:</label>
+                <input type="text" id="newName" placeholder="مثال: شوكولاتة كيندر">
+            </div>
+            <div class="form-group">
+                <label>الفئة:</label>
+                <select id="newCategory">
+                    <option value="مشروبات">مشروبات</option>
+                    <option value="مقرمشات">مقرمشات</option>
+                    <option value="حلويات">حلويات</option>
+                    <option value="ألبان">ألبان</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>صورة مصغرة (إيموجي):</label>
+                <input type="text" id="newIcon" placeholder="🍫 أو 🧃 أو 🍪" value="📦">
+            </div>
+            <div class="form-group">
+                <label>رأس المال (سعر الشراء):</label>
+                <input type="number" id="newCost" placeholder="0">
+            </div>
+            <div class="form-group">
+                <label>سعر البيع:</label>
+                <input type="number" id="newSell" placeholder="0">
+            </div>
+            <button class="btn-submit" onclick="addNewProduct()">حفظ وإضافة المنتج</button>
         </div>
     </div>
 
-    <!-- شريط البحث -->
-    <input type="text" id="searchBox" class="search-box" placeholder="🔍 ابحث عن منتج..." oninput="filterProducts()">
-
-    <!-- الفئات -->
-    <div class="categories" id="categoriesContainer">
-        <button class="cat-btn active" onclick="filterCategory('الكل', this)">الكل</button>
-        <button class="cat-btn" onclick="filterCategory('مشروبات', this)">مشروبات</button>
-        <button class="cat-btn" onclick="filterCategory('مقرمشات', this)">مقرمشات</button>
-        <button class="cat-btn" onclick="filterCategory('حلويات', this)">حلويات</button>
-        <button class="cat-btn" onclick="filterCategory('ألبان', this)">ألبان</button>
-        <button class="cat-btn" onclick="filterCategory('دخان', this)">دخان</button>
-    </div>
-
-    <!-- قائمة المنتجات -->
-    <div class="products-container" id="productsList"></div>
-
-    <!-- ملخص السلة -->
-    <div class="cart-summary">
-        <div class="summary-row">
-            <span>مجموع الزبون (الطوطال):</span>
-            <b id="total-sell" style="color: var(--primary);">0 دج</b>
-        </div>
-        
-        <div class="actions-group">
-            <button class="btn-reset" onclick="resetCart()">مسح السلة</button>
-            <button class="btn-checkout" onclick="checkout()">إتمام وإرسال الفاتورة 🧾</button>
+    <!-- 3. تبويب تغيير الأسعار -->
+    <div id="tab-prices" class="tab-content">
+        <h2>✏️ تغيير أسعار المنتجات</h2>
+        <div class="form-card">
+            <div class="form-group">
+                <label>اختر المنتج:</label>
+                <select id="editProductSelect" onchange="loadProductData()"></select>
+            </div>
+            <div class="form-group">
+                <label>رأس المال الجديد:</label>
+                <input type="number" id="editCost">
+            </div>
+            <div class="form-group">
+                <label>سعر البيع الجديد:</label>
+                <input type="number" id="editSell">
+            </div>
+            <button class="btn-submit" onclick="updateProductPrice()" style="background: var(--success);">تحديث السعر</button>
         </div>
     </div>
+
+    <!-- شريط التنقل السفلي -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('tab-sell', this)">
+            <span>🛒</span>البيع
+        </button>
+        <button class="nav-item" onclick="switchTab('tab-add', this)">
+            <span>➕</span>إضافة منتج
+        </button>
+        <button class="nav-item" onclick="switchTab('tab-prices', this); populateEditSelect();">
+            <span>✏️</span>تغيير الأسعار
+        </button>
+    </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const products = [
-            { id: 1, name: "كوكاكولا 1لتر", category: "مشروبات", cost: 100, sell: 120, qty: 0 },
-            { id: 2, name: "فانتا أورانج 1لتر", category: "مشروبات", cost: 100, sell: 120, qty: 0 },
-            { id: 3, name: "ماء بقارة 0.5لتر", category: "مشروبات", cost: 20, sell: 25, qty: 0 },
-            { id: 4, name: "شيبس تشيبوس", category: "مقرمشات", cost: 25, sell: 30, qty: 0 },
-            { id: 5, name: "شيبس بيجو", category: "مقرمشات", cost: 12, sell: 15, qty: 0 },
-            { id: 6, name: "كوفريك ماكسون", category: "حلويات", cost: 15, sell: 20, qty: 0 },
-            { id: 7, name: "شكولاطة ريكورو", category: "حلويات", cost: 30, sell: 40, qty: 0 },
-            { id: 8, name: "حليب صومام 1لتر", category: "ألبان", cost: 45, sell: 50, qty: 0 },
-            { id: 9, name: "ياغورت صفا", category: "ألبان", cost: 20, sell: 25, qty: 0 },
-            { id: 10, name: "علبة سجائر مارلبورو", category: "دخان", cost: 450, sell: 500, qty: 0 },
-            { id: 11, name: "علبة سجائر ليرام", category: "دخان", cost: 320, sell: 350, qty: 0 }
+        let products = [
+            { id: 1, name: "كوكاكولا 1لتر", category: "مشروبات", icon: "🥤", cost: 100, sell: 120, qty: 0 },
+            { id: 2, name: "فانتا أورانج 1لتر", category: "مشروبات", icon: "🍊", cost: 100, sell: 120, qty: 0 },
+            { id: 3, name: "ماء بقارة 0.5لتر", category: "مشروبات", icon: "💧", cost: 20, sell: 25, qty: 0 },
+            { id: 4, name: "شيبس تشيبوس", category: "مقرمشات", icon: "🍟", cost: 25, sell: 30, qty: 0 },
+            { id: 5, name: "شيبس بيجو", category: "مقرمشات", icon: "🍿", cost: 12, sell: 15, qty: 0 },
+            { id: 6, name: "كوفريك ماكسون", category: "حلويات", icon: "🧇", cost: 15, sell: 20, qty: 0 },
+            { id: 7, name: "شكولاطة ريكورو", category: "حلويات", icon: "🍫", cost: 30, sell: 40, qty: 0 },
+            { id: 8, name: "حليب صومام 1لتر", category: "ألبان", icon: "🥛", cost: 45, sell: 50, qty: 0 },
+            { id: 9, name: "ياغورت صفا", category: "ألبان", icon: "🍮", cost: 20, sell: 25, qty: 0 }
         ];
 
         let currentCategory = 'الكل';
         let searchQuery = '';
+
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
 
         function renderProducts() {
             const listDiv = document.getElementById('productsList');
@@ -261,16 +323,19 @@
             });
 
             if (filtered.length === 0) {
-                listDiv.innerHTML = '<p style="text-align:center; color:#999; font-size:12px; margin:10px;">لا توجد منتجات مطابقة</p>';
+                listDiv.innerHTML = '<p style="text-align:center; color:#999; font-size:11px; margin:10px;">لا توجد منتجات مطابقة</p>';
                 return;
             }
 
             filtered.forEach(p => {
                 listDiv.innerHTML += `
                     <div class="product-card">
-                        <div class="product-info">
-                            <h4>${p.name}</h4>
-                            <p>بيع: ${p.sell} دج | شراء: ${p.cost} دج</p>
+                        <div class="product-left">
+                            <div class="product-icon">${p.icon || '📦'}</div>
+                            <div class="product-info">
+                                <h4>${p.name}</h4>
+                                <p>بيع: ${p.sell} دج | شراء: ${p.cost} دج</p>
+                            </div>
                         </div>
                         <div class="controls">
                             <button class="qty-btn btn-minus" onclick="changeQty(${p.id}, -1)">-</button>
@@ -322,6 +387,65 @@
             if (confirm("مسح السلة الحالية؟")) {
                 products.forEach(p => p.qty = 0);
                 renderProducts();
+            }
+        }
+
+        function addNewProduct() {
+            const name = document.getElementById('newName').value.trim();
+            const category = document.getElementById('newCategory').value;
+            const icon = document.getElementById('newIcon').value.trim() || '📦';
+            const cost = parseFloat(document.getElementById('newCost').value);
+            const sell = parseFloat(document.getElementById('newSell').value);
+
+            if (!name || isNaN(cost) || isNaN(sell)) {
+                alert("الرجاء ملء جميع الحقول بشكل صحيح!");
+                return;
+            }
+
+            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+            products.push({ id: newId, name, category, icon, cost, sell, qty: 0 });
+
+            alert("تمت إضافة المنتج بنجاح!");
+            document.getElementById('newName').value = '';
+            document.getElementById('newCost').value = '';
+            document.getElementById('newSell').value = '';
+            
+            switchTab('tab-sell', document.querySelector('.nav-item'));
+            renderProducts();
+        }
+
+        function populateEditSelect() {
+            const select = document.getElementById('editProductSelect');
+            select.innerHTML = '';
+            products.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.icon} ${p.name} (بيع: ${p.sell}دج)</option>`;
+            });
+            loadProductData();
+        }
+
+        function loadProductData() {
+            const id = parseInt(document.getElementById('editProductSelect').value);
+            const p = products.find(prod => prod.id === id);
+            if (p) {
+                document.getElementById('editCost').value = p.cost;
+                document.getElementById('editSell').value = p.sell;
+            }
+        }
+
+        function updateProductPrice() {
+            const id = parseInt(document.getElementById('editProductSelect').value);
+            const cost = parseFloat(document.getElementById('editCost').value);
+            const sell = parseFloat(document.getElementById('editSell').value);
+
+            const p = products.find(prod => prod.id === id);
+            if (p && !isNaN(cost) && !isNaN(sell)) {
+                p.cost = cost;
+                p.sell = sell;
+                alert("تم تحديث السعر بنجاح!");
+                switchTab('tab-sell', document.querySelector('.nav-item'));
+                renderProducts();
+            } else {
+                alert("الرجاء إدخال أرقام صحيحة!");
             }
         }
 
