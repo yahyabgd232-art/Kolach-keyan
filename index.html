@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="fr" dir="ltr" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,14 +21,30 @@
             margin: 0;
             padding: 8px;
             padding-bottom: 60px;
-            direction: ltr;
-            text-align: left;
+        }
+        
+        /* رأس الصفحة مع زر تغيير اللغة (الكوكب) */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
         }
         h2 {
-            text-align: center;
             color: var(--primary);
             font-size: 16px;
-            margin: 5px 0 8px 0;
+            margin: 0;
+        }
+        .lang-btn {
+            background: #e9ecef;
+            border: 1px solid #ced4da;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         
         .tab-content { display: none; }
@@ -38,6 +54,7 @@
             display: flex;
             gap: 8px;
             margin-bottom: 8px;
+            margin-top: 5px;
         }
         .wallet-box {
             flex: 1;
@@ -81,7 +98,7 @@
         }
         .cat-btn.active { background: var(--primary); color: white; }
         
-        .products-container { max-height: 36vh; overflow-y: auto; }
+        .products-container { max-height: 35vh; overflow-y: auto; }
         .product-card {
             background: var(--card);
             padding: 5px 8px;
@@ -91,8 +108,11 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            border-left: 3px solid var(--primary);
         }
+        /* اتجاه الكارت حسب اللغة */
+        html[dir="ltr"] .product-card { border-left: 3px solid var(--primary); }
+        html[dir="rtl"] .product-card { border-right: 3px solid var(--primary); }
+
         .product-left {
             display: flex;
             align-items: center;
@@ -140,7 +160,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             margin-top: 10px;
         }
-        .form-group { margin-bottom: 10px; text-align: left; }
+        .form-group { margin-bottom: 10px; text-align: inherit; }
         .form-group label { display: block; font-size: 12px; margin-bottom: 3px; color: #555; }
         .form-group input, .form-group select {
             width: 100%; padding: 8px; font-size: 13px;
@@ -181,18 +201,22 @@
         .nav-item span { display: block; font-size: 16px; margin-bottom: 2px; }
     </style>
 </head>
-<body>
+<body id="bodyTag">
 
     <!-- 1. Tab Vente -->
     <div id="tab-sell" class="tab-content active">
-        <h2>🏪 Smart Caissier DZ</h2>
+        <div class="header-container">
+            <h2 id="txtAppTitle">🏪 Smart Caissier DZ</h2>
+            <button class="lang-btn" onclick="toggleLanguage()">🌐 <span id="langName">FR</span></button>
+        </div>
+
         <div class="wallets-container">
             <div class="wallet-box wallet-capital">
-                <span>Capital (Achat)</span>
+                <span id="txtCapLabel">Capital (Achat)</span>
                 <h3 id="wallet-cost">0 DA</h3>
             </div>
             <div class="wallet-box wallet-profit">
-                <span>Bénéfice Net</span>
+                <span id="txtProfLabel">Bénéfice Net</span>
                 <h3 id="wallet-profit">0 DA</h3>
             </div>
         </div>
@@ -200,91 +224,91 @@
         <input type="text" id="searchBox" class="search-box" placeholder="🔍 Rechercher un produit..." oninput="filterProducts()">
 
         <div class="categories" id="categoriesContainer">
-            <button class="cat-btn active" onclick="filterCategory('Tous', this)">Tous</button>
-            <button class="cat-btn" onclick="filterCategory('Boissons', this)">Boissons</button>
-            <button class="cat-btn" onclick="filterCategory('Chips', this)">Chips</button>
-            <button class="cat-btn" onclick="filterCategory('Chocolats', this)">Chocolats</button>
-            <button class="cat-btn" onclick="filterCategory('Laitiers', this)">Laitiers</button>
-            <button class="cat-btn" onclick="filterCategory('Couches', this)">Couches</button>
+            <button class="cat-btn active" onclick="filterCategory('Tous', this)" id="catAll">Tous</button>
+            <button class="cat-btn" onclick="filterCategory('Boissons', this)" id="catDrink">Boissons</button>
+            <button class="cat-btn" onclick="filterCategory('Chips', this)" id="catChips">Chips</button>
+            <button class="cat-btn" onclick="filterCategory('Chocolats', this)" id="catChoco">Chocolats</button>
+            <button class="cat-btn" onclick="filterCategory('Laitiers', this)" id="catMilk">Laitiers</button>
+            <button class="cat-btn" onclick="filterCategory('Couches', this)" id="catCouches">Couches</button>
         </div>
 
         <div class="products-container" id="productsList"></div>
 
         <div class="cart-summary">
             <div class="summary-row">
-                <span>Total Client:</span>
+                <span id="txtTotalClient">Total Client:</span>
                 <b id="total-sell" style="color: var(--primary);">0 DA</b>
             </div>
             <div class="actions-group">
-                <button class="btn-reset" onclick="resetCart()">Vider</button>
-                <button class="btn-checkout" onclick="checkout()">Valider & Envoyer la Facture 🧾</button>
+                <button class="btn-reset" onclick="resetCart()" id="btnReset">Vider</button>
+                <button class="btn-checkout" onclick="checkout()" id="btnCheckout">Valider & Envoyer 🧾</button>
             </div>
         </div>
     </div>
 
     <!-- 2. Tab Ajouter Produit -->
     <div id="tab-add" class="tab-content">
-        <h2>➕ Nouveau Produit</h2>
+        <h2 id="txtAddTitle">➕ Nouveau Produit</h2>
         <div class="form-card">
             <div class="form-group">
-                <label>Nom du Produit:</label>
+                <label id="lblProdName">Nom du Produit:</label>
                 <input type="text" id="newName" placeholder="Ex: Kinder Bueno">
             </div>
             <div class="form-group">
-                <label>Catégorie:</label>
+                <label id="lblCategory">Catégorie:</label>
                 <select id="newCategory">
-                    <option value="Boissons">Boissons</option>
-                    <option value="Chips">Chips</option>
-                    <option value="Chocolats">Chocolats</option>
-                    <option value="Laitiers">Laitiers</option>
-                    <option value="Couches">Couches</option>
+                    <option value="Boissons" id="optDrink">Boissons</option>
+                    <option value="Chips" id="optChips">Chips</option>
+                    <option value="Chocolats" id="optChoco">Chocolats</option>
+                    <option value="Laitiers" id="optMilk">Laitiers</option>
+                    <option value="Couches" id="optCouches">Couches</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>Icône (Emoji):</label>
-                <input type="text" id="newIcon" placeholder="🍫 ou 🥤" value="📦">
+                <label id="lblIcon">Icône (Emoji):</label>
+                <input type="text" id="newIcon" value="📦">
             </div>
             <div class="form-group">
-                <label>Prix d'Achat (Capital):</label>
+                <label id="lblCost">Prix d'Achat (Capital):</label>
                 <input type="number" id="newCost" placeholder="0">
             </div>
             <div class="form-group">
-                <label>Prix de Vente:</label>
+                <label id="lblSell">Prix de Vente:</label>
                 <input type="number" id="newSell" placeholder="0">
             </div>
-            <button class="btn-submit" onclick="addNewProduct()">Enregistrer le Produit</button>
+            <button class="btn-submit" onclick="addNewProduct()" id="btnSaveProd">Enregistrer le Produit</button>
         </div>
     </div>
 
     <!-- 3. Tab Modifier Prix -->
     <div id="tab-prices" class="tab-content">
-        <h2>✏️ Modifier les Prix</h2>
+        <h2 id="txtEditTitle">✏️ Modifier les Prix</h2>
         <div class="form-card">
             <div class="form-group">
-                <label>Choisir le Produit:</label>
+                <label id="lblSelectProd">Choisir le Produit:</label>
                 <select id="editProductSelect" onchange="loadProductData()"></select>
             </div>
             <div class="form-group">
-                <label>Nouveau Prix d'Achat:</label>
+                <label id="lblNewCost">Nouveau Prix d'Achat:</label>
                 <input type="number" id="editCost">
             </div>
             <div class="form-group">
-                <label>Nouveau Prix de Vente:</label>
+                <label id="lblNewSell">Nouveau Prix de Vente:</label>
                 <input type="number" id="editSell">
             </div>
-            <button class="btn-submit" onclick="updateProductPrice()" style="background: var(--success);">Mettre à jour</button>
+            <button class="btn-submit" onclick="updateProductPrice()" style="background: var(--success);" id="btnUpdate">Mettre à jour</button>
         </div>
     </div>
 
     <!-- Navigation en bas -->
     <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchTab('tab-sell', this)">
+        <button class="nav-item active" onclick="switchTab('tab-sell', this)" id="navSell">
             <span>🛒</span>Vente
         </button>
-        <button class="nav-item" onclick="switchTab('tab-add', this)">
+        <button class="nav-item" onclick="switchTab('tab-add', this)" id="navAdd">
             <span>➕</span>Ajouter
         </button>
-        <button class="nav-item" onclick="switchTab('tab-prices', this); populateEditSelect();">
+        <button class="nav-item" onclick="switchTab('tab-prices', this); populateEditSelect();" id="navPrices">
             <span>✏️</span>Prix
         </button>
     </nav>
@@ -293,193 +317,137 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
+        let currentLang = 'fr'; // fr أو ar
+
+        const translations = {
+            fr: {
+                appTitle: "🏪 Smart Caissier DZ",
+                capLabel: "Capital (Achat)",
+                profLabel: "Bénéfice Net",
+                searchPH: "🔍 Rechercher un produit...",
+                catAll: "Tous",
+                catDrink: "Boissons",
+                catChips: "Chips",
+                catChoco: "Chocolats",
+                catMilk: "Laitiers",
+                catCouches: "Couches",
+                totalClient: "Total Client:",
+                btnReset: "Vider",
+                btnCheckout: "Valider & Envoyer 🧾",
+                addTitle: "➕ Nouveau Produit",
+                lblProdName: "Nom du Produit:",
+                lblCategory: "Catégorie:",
+                lblIcon: "Icône (Emoji):",
+                lblCost: "Prix d'Achat (Capital):",
+                lblSell: "Prix de Vente:",
+                btnSaveProd: "Enregistrer le Produit",
+                editTitle: "✏️ Modifier les Prix",
+                lblSelectProd: "Choisir le Produit:",
+                lblNewCost: "Nouveau Prix d'Achat:",
+                lblNewSell: "Nouveau Prix de Vente:",
+                btnUpdate: "Mettre à jour",
+                navSell: "Vente",
+                navAdd: "Ajouter",
+                navPrices: "Prix",
+                sellText: "Vente",
+                costText: "Achat",
+                emptyCart: "Le panier est vide !",
+                emptyList: "Aucun produit trouvé",
+                msgAdded: "Produit ajouté avec succès !",
+                msgUpdated: "Prix mis à jour avec succès !",
+                msgReset: "Voulez-vous vider le panier ?",
+                msgFill: "Veuillez remplir tous les champs correctement !",
+                msgValidNum: "Veuillez entrer des chiffres valides !"
+            },
+            ar: {
+                appTitle: "🏪 الصندوق الذكي الجزائر",
+                capLabel: "رأس المال (الشراء)",
+                profLabel: "الصافي (الربح)",
+                searchPH: "🔍 ابحث عن منتج...",
+                catAll: "الكل",
+                catDrink: "المشروبات",
+                catChips: "الشيبس",
+                catChoco: "الشوكولاتة",
+                catMilk: "الألبان",
+                catCouches: "الحفاضات",
+                totalClient: "المجموع الكلي:",
+                btnReset: "إفراغ",
+                btnCheckout: "إرسال الفاتورة 🧾",
+                addTitle: "➕ إضافة منتج جديد",
+                lblProdName: "اسم المنتج:",
+                lblCategory: "التصنيف:",
+                lblIcon: "الأيقونة (رموز تعبيرية):",
+                lblCost: "سعر الشراء (رأس المال):",
+                lblSell: "سعر البيع:",
+                btnSaveProd: "حفظ المنتج",
+                editTitle: "✏️ تعديل الأسعار",
+                lblSelectProd: "اختر المنتج:",
+                lblNewCost: "سعر الشراء الجديد:",
+                lblNewSell: "سعر البيع الجديد:",
+                btnUpdate: "تحديث السعر",
+                navSell: "البيع",
+                navAdd: "إضافة",
+                navPrices: "الأسعار",
+                sellText: "البيع",
+                costText: "الشراء",
+                emptyCart: "السلة فارغة!",
+                emptyList: "لم يتم العثور على منتجات",
+                msgAdded: "تم إضافة المنتج بنجاح!",
+                msgUpdated: "تم تحديث السعر بنجاح!",
+                msgReset: "هل تريد إفراغ السلة؟",
+                msgFill: "الرجاء ملء جميع الحقول بشكل صحيح!",
+                msgValidNum: "الرجاء إدخال أرقام صحيحة!"
+            }
+        };
+
         let products = [
-            // Boissons
-            { id: 1, name: "Coca-Cola 1L", category: "Boissons", icon: "🥤", cost: 100, sell: 120, qty: 0 },
-            { id: 2, name: "Fanta Orange 1L", category: "Boissons", icon: "🍊", cost: 100, sell: 120, qty: 0 },
-            { id: 3, name: "Hamoud Selecto 1L", category: "Boissons", icon: "🍾", cost: 90, sell: 110, qty: 0 },
-            { id: 4, name: "Rouiba Multifruits 1L", category: "Boissons", icon: "🧃", cost: 140, sell: 170, qty: 0 },
-            { id: 5, name: "Eau Pure 0.5L", category: "Boissons", icon: "💧", cost: 20, sell: 25, qty: 0 },
+            // Boissons (مشروبات: كوكاكولا، فانتا، فونطاشينا، أورنج)
+            { id: 1, nameFr: "Coca-Cola / Michifota 1L", nameAr: "كوكاكولا / مشيفوطا 1 لتر", category: "Boissons", icon: "🥤", cost: 100, sell: 120, qty: 0 },
+            { id: 2, nameFr: "Fanta Orange / Orangina", nameAr: "فانتا أورنج / أورونج", category: "Boissons", icon: "🍊", cost: 100, sell: 120, qty: 0 },
+            { id: 3, nameFr: "Fontachina / Hamoud Selecto 1L", nameAr: "فونطاشينا / حمود سيلكتو 1 لتر", category: "Boissons", icon: "🍾", cost: 90, sell: 110, qty: 0 },
+            { id: 4, nameFr: "Rouiba Multifruits 1L", nameAr: "رويبة فواكه مشكلة 1 لتر", category: "Boissons", icon: "🧃", cost: 140, sell: 170, qty: 0 },
+            { id: 5, nameFr: "Eau Pure 0.5L", nameAr: "ماء صافي 0.5 لتر", category: "Boissons", icon: "💧", cost: 20, sell: 25, qty: 0 },
             
-            // Chips
-            { id: 6, name: "Chips Cheetos", category: "Chips", icon: "🍟", cost: 25, sell: 30, qty: 0 },
-            { id: 7, name: "Chips Chipsos", category: "Chips", icon: "🍿", cost: 20, sell: 25, qty: 0 },
-            { id: 8, name: "Chips Salé (Discover)", category: "Chips", icon: "🥔", cost: 25, sell: 30, qty: 0 },
-            { id: 9, name: "Chips Fromage (Discover)", category: "Chips", icon: "🧀", cost: 25, sell: 30, qty: 0 },
-            { id: 10, name: "Koki / Pinguin", category: "Chips", icon: "🥨", cost: 12, sell: 15, qty: 0 },
+            // Chips (شيبس وأنواعه)
+            { id: 6, nameFr: "Chips Cheetos", nameAr: "شيبس شيتوس", category: "Chips", icon: "🍟", cost: 25, sell: 30, qty: 0 },
+            { id: 7, nameFr: "Chips Chipsos", nameAr: "شيبس شيبسوس", category: "Chips", icon: "🍿", cost: 20, sell: 25, qty: 0 },
+            { id: 8, nameFr: "Chips Salé (Discover / Crunchi)", nameAr: "شيبس مالح (كرانشي / ديسكفر)", category: "Chips", icon: "🥔", cost: 25, sell: 30, qty: 0 },
+            { id: 9, nameFr: "Chips Fromage (Discover)", nameAr: "شيبس فرماج (ديسكفر)", category: "Chips", icon: "🧀", cost: 25, sell: 30, qty: 0 },
+            { id: 10, nameFr: "Koki / Pinguin", nameAr: "كوكي / بنغوان", category: "Chips", icon: "🥨", cost: 12, sell: 15, qty: 0 },
 
-            // Chocolats & Biscuits
-            { id: 11, name: "Kinder Bueno", category: "Chocolats", icon: "🍫", cost: 120, sell: 150, qty: 0 },
-            { id: 12, name: "Maxi King", category: "Chocolats", icon: "🥮", cost: 90, sell: 120, qty: 0 },
-            { id: 13, name: "Snickers / Bounty", category: "Chocolats", icon: "🍬", cost: 60, sell: 80, qty: 0 },
-            { id: 14, name: "Choko Maxon", category: "Chocolats", icon: "🧇", cost: 15, sell: 20, qty: 0 },
-            { id: 15, name: "Ricoro Chocolat", category: "Chocolats", icon: "🍫", cost: 30, sell: 40, qty: 0 },
-            { id: 16, name: "Biscuits Bimo / Palma", category: "Chocolats", icon: "🍪", cost: 10, sell: 15, qty: 0 },
+            // Chocolats & Biscuits (شوكولاتة وحلويات متنوعة)
+            { id: 11, nameFr: "Kinder Bueno", nameAr: "كندر بوينو", category: "Chocolats", icon: "🍫", cost: 120, sell: 150, qty: 0 },
+            { id: 12, nameFr: "Maxi King", nameAr: "ماكسي كينغ", category: "Chocolats", icon: "🥮", cost: 90, sell: 120, qty: 0 },
+            { id: 13, nameFr: "Snickers / Bounty", nameAr: "سنيكرز / باونتي", category: "Chocolats", icon: "🍬", cost: 60, sell: 80, qty: 0 },
+            { id: 14, nameFr: "Choko Maxon", nameAr: "شوكو ماكسون", category: "Chocolats", icon: "🧇", cost: 15, sell: 20, qty: 0 },
+            { id: 15, nameFr: "Ricoro Chocolat", nameAr: "شوكولاتة ريكورو", category: "Chocolats", icon: "🍫", cost: 30, sell: 40, qty: 0 },
+            { id: 16, nameFr: "Biscuits Bimo / Palma", nameAr: "بسكويت بيمو / بالما", category: "Chocolats", icon: "🍪", cost: 10, sell: 15, qty: 0 },
 
-            // Laitiers
-            { id: 17, name: "Lait Soummam 1L", category: "Laitiers", icon: "🥛", cost: 45, sell: 50, qty: 0 },
-            { id: 18, name: "Yaourt Danette", category: "Laitiers", icon: "🍮", cost: 30, sell: 40, qty: 0 },
-            { id: 19, name: "Yaourt Célia", category: "Laitiers", icon: "🥛", cost: 20, sell: 25, qty: 0 },
-            { id: 20, name: "Fromage La Vache qui Rit", category: "Laitiers", icon: "🧀", cost: 150, sell: 180, qty: 0 },
+            // Laitiers (ألبان)
+            { id: 17, nameFr: "Lait Soummam 1L", nameAr: "حليب الصومام 1 لتر", category: "Laitiers", icon: "🥛", cost: 45, sell: 50, qty: 0 },
+            { id: 18, nameFr: "Yaourt Danette", nameAr: "دانيت ديسير", category: "Laitiers", icon: "🍮", cost: 30, sell: 40, qty: 0 },
+            { id: 19, nameFr: "Yaourt Célia", nameAr: "ياغورت سيليا", category: "Laitiers", icon: "🥛", cost: 20, sell: 25, qty: 0 },
+            { id: 20, nameFr: "Fromage La Vache qui Rit", nameAr: "جبن البقرة الضاحكة", category: "Laitiers", icon: "🧀", cost: 150, sell: 180, qty: 0 },
 
-            // Couches
-            { id: 21, name: "Couches Dalia Bébé T3", category: "Couches", icon: "👶", cost: 850, sell: 1000, qty: 0 },
-            { id: 22, name: "Couches Dalia Bébé T4", category: "Couches", icon: "👶", cost: 950, sell: 1150, qty: 0 },
-            { id: 23, name: "Couches Hana T3/T4", category: "Couches", icon: "🍼", cost: 800, sell: 950, qty: 0 }
+            // Couches (حفاضات)
+            { id: 21, nameFr: "Couches Dalia Bébé T3", nameAr: "حفاضات داليا بيبي رقم 3", category: "Couches", icon: "👶", cost: 850, sell: 1000, qty: 0 },
+            { id: 22, nameFr: "Couches Dalia Bébé T4", nameAr: "حفاضات داليا بيبي رقم 4", category: "Couches", icon: "👶", cost: 950, sell: 1150, qty: 0 },
+            { id: 23, nameFr: "Couches Hana T3/T4", nameAr: "حفاضات هنا رقم 3/4", category: "Couches", icon: "🍼", cost: 800, sell: 950, qty: 0 }
         ];
 
         let currentCategory = 'Tous';
         let searchQuery = '';
 
-        function switchTab(tabId, btnElement) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            btnElement.classList.add('active');
-        }
-
-        function renderProducts() {
-            const listDiv = document.getElementById('productsList');
-            listDiv.innerHTML = '';
-
-            const filtered = products.filter(p => {
-                const matchesCat = currentCategory === 'Tous' || p.category === currentCategory;
-                const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-                return matchesCat && matchesSearch;
-            });
-
-            if (filtered.length === 0) {
-                listDiv.innerHTML = '<p style="text-align:center; color:#999; font-size:11px; margin:10px;">Aucun produit trouvé</p>';
-                return;
-            }
-
-            filtered.forEach(p => {
-                listDiv.innerHTML += `
-                    <div class="product-card">
-                        <div class="product-left">
-                            <div class="product-icon">${p.icon || '📦'}</div>
-                            <div class="product-info">
-                                <h4>${p.name}</h4>
-                                <p>Vente: ${p.sell} DA | Achat: ${p.cost} DA</p>
-                            </div>
-                        </div>
-                        <div class="controls">
-                            <button class="qty-btn btn-minus" onclick="changeQty(${p.id}, -1)">-</button>
-                            <span class="qty-num">${p.qty}</span>
-                            <button class="qty-btn btn-plus" onclick="changeQty(${p.id}, 1)">+</button>
-                        </div>
-                    </div>
-                `;
-            });
-            calculateTotals();
-        }
-
-        function changeQty(id, delta) {
-            const prod = products.find(p => p.id === id);
-            if (prod) {
-                prod.qty += delta;
-                if (prod.qty < 0) prod.qty = 0;
-                renderProducts();
-            }
-        }
-
-        function filterCategory(cat, btnElement) {
-            currentCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btnElement.classList.add('active');
-            renderProducts();
-        }
-
-        function filterProducts() {
-            searchQuery = document.getElementById('searchBox').value;
-            renderProducts();
-        }
-
-        function calculateTotals() {
-            let tSell = 0;
-            let tCost = 0;
-            products.forEach(p => {
-                tSell += p.sell * p.qty;
-                tCost += p.cost * p.qty;
-            });
-            let profit = tSell - tCost;
-
-            document.getElementById('total-sell').innerText = tSell + ' DA';
-            document.getElementById('wallet-cost').innerText = tCost + ' DA';
-            document.getElementById('wallet-profit').innerText = profit + ' DA';
-        }
-
-        function resetCart() {
-            if (confirm("Voulez-vous vider le panier ?")) {
-                products.forEach(p => p.qty = 0);
-                renderProducts();
-            }
-        }
-
-        function addNewProduct() {
-            const name = document.getElementById('newName').value.trim();
-            const category = document.getElementById('newCategory').value;
-            const icon = document.getElementById('newIcon').value.trim() || '📦';
-            const cost = parseFloat(document.getElementById('newCost').value);
-            const sell = parseFloat(document.getElementById('newSell').value);
-
-            if (!name || isNaN(cost) || isNaN(sell)) {
-                alert("Veuillez remplir tous les champs correctement !");
-                return;
-            }
-
-            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-            products.push({ id: newId, name, category, icon, cost, sell, qty: 0 });
-
-            alert("Produit ajouté avec succès !");
-            document.getElementById('newName').value = '';
-            document.getElementById('newCost').value = '';
-            document.getElementById('newSell').value = '';
+        function toggleLanguage() {
+            currentLang = currentLang === 'fr' ? 'ar' : 'fr';
+            const htmlRoot = document.getElementById('htmlRoot');
             
-            switchTab('tab-sell', document.querySelector('.nav-item'));
-            renderProducts();
-        }
-
-        function populateEditSelect() {
-            const select = document.getElementById('editProductSelect');
-            select.innerHTML = '';
-            products.forEach(p => {
-                select.innerHTML += `<option value="${p.id}">${p.icon} ${p.name} (Vente: ${p.sell}DA)</option>`;
-            });
-            loadProductData();
-        }
-
-        function loadProductData() {
-            const id = parseInt(document.getElementById('editProductSelect').value);
-            const p = products.find(prod => prod.id === id);
-            if (p) {
-                document.getElementById('editCost').value = p.cost;
-                document.getElementById('editSell').value = p.sell;
-            }
-        }
-
-        function updateProductPrice() {
-            const id = parseInt(document.getElementById('editProductSelect').value);
-            const cost = parseFloat(document.getElementById('editCost').value);
-            const sell = parseFloat(document.getElementById('editSell').value);
-
-            const p = products.find(prod => prod.id === id);
-            if (p && !isNaN(cost) && !isNaN(sell)) {
-                p.cost = cost;
-                p.sell = sell;
-                alert("Prix mis à jour avec succès !");
-                switchTab('tab-sell', document.querySelector('.nav-item'));
-                renderProducts();
+            if (currentLang === 'ar') {
+                htmlRoot.setAttribute('dir', 'rtl');
+                htmlRoot.setAttribute('lang', 'ar');
+                document.getElementById('langName').innerText = 'AR';
             } else {
-                alert("Veuillez entrer des chiffres valides !");
-            }
-        }
-
-        function checkout() {
-            let tSell = 0;
-            let tCost = 0;
-            let summaryText = "📦 ─── **FACTURE DE VENTE** ─── 📦\n\n";
-            
-            products.forEach(p => {
-                if (p.qty > 0) {
-                    summaryText += `▪️ ${p.nam
+                htmlRoot.setAttribute('dir', 'ltr');
+                htmlRoot.setAttribute('lang', 'fr');
+                document.getElementById('langName').innerText = 'FR';
+     
