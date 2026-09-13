@@ -3,167 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام كاشي السوبرات الذكي</title>
+    <title>نظام الكاشي الذكي</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --primary-color: #0088cc;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-color: #333333;
+            --primary: #0088cc;
+            --success: #28a745;
+            --danger: #dc3545;
+            --bg: #f4f6f9;
+            --card: #ffffff;
+            --text: #2c3e50;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
+            font-family: Tahoma, sans-serif;
+            background: var(--bg);
+            color: var(--text);
             margin: 0;
-            padding: 10px;
+            padding: 8px;
             direction: rtl;
         }
         h2 {
             text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 18px;
+            margin: 5px 0 10px 0;
         }
+        
+        /* محفظتا رأس المال والفايدة في الأعلى */
+        .wallets-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .wallet-box {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .wallet-capital {
+            background: linear-gradient(135deg, #6c757d, #495057);
+        }
+        .wallet-profit {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+        }
+        .wallet-box span {
+            display: block;
+            font-size: 11px;
+            opacity: 0.9;
+        }
+        .wallet-box h3 {
+            margin: 3px 0 0 0;
+            font-size: 15px;
+        }
+
         .search-box {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 12px;
+            padding: 8px 10px;
+            font-size: 14px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            margin-bottom: 8px;
             box-sizing: border-box;
             outline: none;
-            transition: border 0.3s;
-        }
-        .search-box:focus {
-            border-color: var(--primary-color);
         }
         .categories {
             display: flex;
-            gap: 5px;
+            gap: 4px;
             overflow-x: auto;
-            padding-bottom: 8px;
-            margin-bottom: 10px;
+            padding-bottom: 5px;
+            margin-bottom: 8px;
         }
         .cat-btn {
             background: #e9ecef;
             border: none;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 13px;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 12px;
             cursor: pointer;
             white-space: nowrap;
-            color: #555;
+            color: #495057;
         }
         .cat-btn.active {
-            background: var(--primary-color);
+            background: var(--primary);
             color: white;
         }
         .products-container {
-            max-height: 45vh;
+            max-height: 40vh;
             overflow-y: auto;
-            padding-right: 2px;
-            padding-left: 2px;
         }
         .product-card {
-            background: var(--card-bg);
-            padding: 10px 12px;
-            margin-bottom: 8px;
-            border-radius: 10px;
+            background: var(--card);
+            padding: 6px 10px;
+            margin-bottom: 6px;
+            border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            border-right: 4px solid var(--primary-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border-right: 3px solid var(--primary);
         }
         .product-info h4 {
-            margin: 0 0 3px 0;
-            font-size: 15px;
-            color: #222;
+            margin: 0 0 2px 0;
+            font-size: 13px;
         }
         .product-info p {
             margin: 0;
-            font-size: 12px;
-            color: #666;
+            font-size: 11px;
+            color: #6c757d;
         }
         .controls {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
         }
         .qty-btn {
-            background: var(--primary-color);
-            color: white;
             border: none;
-            width: 30px;
-            height: 30px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
-            font-size: 18px;
+            font-size: 14px;
+            font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
-        .qty-btn:active {
-            transform: scale(0.95);
-        }
+        .btn-plus { background-color: var(--success); }
+        .btn-minus { background-color: var(--danger); }
+        .qty-btn:active { transform: scale(0.9); }
+        
         .qty-num {
             font-weight: bold;
-            font-size: 16px;
-            min-width: 20px;
+            font-size: 14px;
+            min-width: 18px;
             text-align: center;
         }
         .cart-summary {
-            background: var(--card-bg);
-            padding: 12px 15px;
-            margin-top: 15px;
-            border-radius: 12px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            bottom: 5px;
+            background: var(--card);
+            padding: 8px 10px;
+            margin-top: 8px;
+            border-radius: 8px;
+            box-shadow: 0 -1px 5px rgba(0,0,0,0.05);
         }
         .summary-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-        .summary-row.total {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--success-color);
-            border-top: 1px dashed #ddd;
-            padding-top: 6px;
-            margin-top: 6px;
+            margin-bottom: 3px;
+            font-size: 13px;
         }
         .actions-group {
             display: flex;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 6px;
+            margin-top: 6px;
         }
         .btn-checkout {
             flex: 2;
-            background: var(--success-color);
+            background: var(--success);
             color: white;
             border: none;
-            padding: 12px;
-            font-size: 16px;
+            padding: 8px;
+            font-size: 14px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
         }
         .btn-reset {
             flex: 1;
-            background: var(--danger-color);
+            background: var(--danger);
             color: white;
             border: none;
-            padding: 12px;
-            font-size: 14px;
-            border-radius: 8px;
+            padding: 8px;
+            font-size: 12px;
+            border-radius: 6px;
             cursor: pointer;
         }
     </style>
@@ -172,10 +188,22 @@
 
     <h2>🏪 نظام الكاشي الذكي</h2>
 
-    <!-- شريط البحث -->
-    <input type="text" id="searchBox" class="search-box" placeholder="🔍 ابحث عن منتج بسرعة..." oninput="filterProducts()">
+    <!-- محفظتا رأس المال والفايدة في الأعلى -->
+    <div class="wallets-container">
+        <div class="wallet-box wallet-capital">
+            <span>رأس المال</span>
+            <h3 id="wallet-cost">0 دج</h3>
+        </div>
+        <div class="wallet-box wallet-profit">
+            <span>الفايدة الصافية</span>
+            <h3 id="wallet-profit">0 دج</h3>
+        </div>
+    </div>
 
-    <!-- فئات المنتجات -->
+    <!-- شريط البحث -->
+    <input type="text" id="searchBox" class="search-box" placeholder="🔍 ابحث عن منتج..." oninput="filterProducts()">
+
+    <!-- الفئات -->
     <div class="categories" id="categoriesContainer">
         <button class="cat-btn active" onclick="filterCategory('الكل', this)">الكل</button>
         <button class="cat-btn" onclick="filterCategory('مشروبات', this)">مشروبات</button>
@@ -188,19 +216,11 @@
     <!-- قائمة المنتجات -->
     <div class="products-container" id="productsList"></div>
 
-    <!-- ملخص السلة والحسابات -->
+    <!-- ملخص السلة -->
     <div class="cart-summary">
         <div class="summary-row">
-            <span>مجموع المبيعات (على الزبون):</span>
-            <span id="total-sell">0 دج</span>
-        </div>
-        <div class="summary-row" style="color: #888; font-size: 12px;">
-            <span>راس المال:</span>
-            <span id="total-cost">0 دج</span>
-        </div>
-        <div class="summary-row total">
-            <span>الفايدة الصافية:</span>
-            <span id="total-profit">0 دج</span>
+            <span>مجموع الزبون (الطوطال):</span>
+            <b id="total-sell" style="color: var(--primary);">0 دج</b>
         </div>
         
         <div class="actions-group">
@@ -213,7 +233,6 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // قاعدة بيانات المنتجات الاحترافية
         const products = [
             { id: 1, name: "كوكاكولا 1لتر", category: "مشروبات", cost: 100, sell: 120, qty: 0 },
             { id: 2, name: "فانتا أورانج 1لتر", category: "مشروبات", cost: 100, sell: 120, qty: 0 },
@@ -242,7 +261,7 @@
             });
 
             if (filtered.length === 0) {
-                listDiv.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px;">لا توجد منتجات مطابقة</p>';
+                listDiv.innerHTML = '<p style="text-align:center; color:#999; font-size:12px; margin:10px;">لا توجد منتجات مطابقة</p>';
                 return;
             }
 
@@ -251,12 +270,12 @@
                     <div class="product-card">
                         <div class="product-info">
                             <h4>${p.name}</h4>
-                            <p>السعر: <b>${p.sell} دج</b> | (شراء: ${p.cost} دج)</p>
+                            <p>بيع: ${p.sell} دج | شراء: ${p.cost} دج</p>
                         </div>
                         <div class="controls">
-                            <button class="qty-btn" onclick="changeQty(${p.id}, -1)">-</button>
+                            <button class="qty-btn btn-minus" onclick="changeQty(${p.id}, -1)">-</button>
                             <span class="qty-num">${p.qty}</span>
-                            <button class="qty-btn" onclick="changeQty(${p.id}, 1)">+</button>
+                            <button class="qty-btn btn-plus" onclick="changeQty(${p.id}, 1)">+</button>
                         </div>
                     </div>
                 `;
@@ -292,13 +311,15 @@
                 tSell += p.sell * p.qty;
                 tCost += p.cost * p.qty;
             });
+            let profit = tSell - tCost;
+
             document.getElementById('total-sell').innerText = tSell + ' دج';
-            document.getElementById('total-cost').innerText = tCost + ' دج';
-            document.getElementById('total-profit').innerText = (tSell - tCost) + ' دج';
+            document.getElementById('wallet-cost').innerText = tCost + ' دج';
+            document.getElementById('wallet-profit').innerText = profit + ' دج';
         }
 
         function resetCart() {
-            if (confirm("هل تريد مسح السلة الحالية؟")) {
+            if (confirm("مسح السلة الحالية؟")) {
                 products.forEach(p => p.qty = 0);
                 renderProducts();
             }
@@ -307,7 +328,7 @@
         function checkout() {
             let tSell = 0;
             let tCost = 0;
-            let summaryText = "🧾 *فاتورة مبيعات جديدة*\n--------------------\n";
+            let summaryText = "📦 ─── **فاتورة مبيعات جديدة** ─── 📦\n\n";
             
             products.forEach(p => {
                 if (p.qty > 0) {
@@ -318,19 +339,18 @@
             });
 
             if (tSell === 0) {
-                alert("السلة فارغة! الرجاء اختيار منتج واحد على الأقل.");
+                alert("السلة فارغة!");
                 return;
             }
 
             let profit = tSell - tCost;
 
-            summaryText += `--------------------\n`;
-            summaryText += `💰 *إجمالي حساب الزبون:* \`${tSell} دج\`\n\n`;
-            summaryText += `🔒 *(بيانات المالك الخاصة)*:\n`;
-            summaryText += `• راس المال: ${tCost} دج\n`;
-            summaryText += `• الفايدة الصافية: \`${profit} دج\` 📈`;
+            summaryText += `\n─────────────────────\n`;
+            summaryText += `💰 **السعر الإجمالي (الطوطال):** \`${tSell} دج\`\n`;
+            summaryText += `📈 **الفايدة الصافية:** \`${profit} دج\`\n`;
+            summaryText += `🔒 **رأس المال:** \`${tCost} دج\`\n`;
+            summaryText += `─────────────────────`;
 
-            // إرسال البيانات للبوت وإغلاق الـ Web App
             tg.sendData(summaryText);
             tg.close();
         }
