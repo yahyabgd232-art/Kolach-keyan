@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الكاشي الذكي</title>
+    <title>Smart Caissier DZ</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -21,7 +21,8 @@
             margin: 0;
             padding: 8px;
             padding-bottom: 60px;
-            direction: rtl;
+            direction: ltr;
+            text-align: left;
         }
         h2 {
             text-align: center;
@@ -90,7 +91,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            border-right: 3px solid var(--primary);
+            border-left: 3px solid var(--primary);
         }
         .product-left {
             display: flex;
@@ -139,7 +140,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             margin-top: 10px;
         }
-        .form-group { margin-bottom: 10px; }
+        .form-group { margin-bottom: 10px; text-align: left; }
         .form-group label { display: block; font-size: 12px; margin-bottom: 3px; color: #555; }
         .form-group input, .form-group select {
             width: 100%; padding: 8px; font-size: 13px;
@@ -182,107 +183,109 @@
 </head>
 <body>
 
-    <!-- 1. تبويب البيع -->
+    <!-- 1. Tab Vente -->
     <div id="tab-sell" class="tab-content active">
-        <h2>🏪 نظام الكاشي الذكي</h2>
+        <h2>🏪 Smart Caissier DZ</h2>
         <div class="wallets-container">
             <div class="wallet-box wallet-capital">
-                <span>رأس المال</span>
-                <h3 id="wallet-cost">0 دج</h3>
+                <span>Capital (Achat)</span>
+                <h3 id="wallet-cost">0 DA</h3>
             </div>
             <div class="wallet-box wallet-profit">
-                <span>الفايدة الصافية</span>
-                <h3 id="wallet-profit">0 دج</h3>
+                <span>Bénéfice Net</span>
+                <h3 id="wallet-profit">0 DA</h3>
             </div>
         </div>
 
-        <input type="text" id="searchBox" class="search-box" placeholder="🔍 ابحث عن منتج..." oninput="filterProducts()">
+        <input type="text" id="searchBox" class="search-box" placeholder="🔍 Rechercher un produit..." oninput="filterProducts()">
 
         <div class="categories" id="categoriesContainer">
-            <button class="cat-btn active" onclick="filterCategory('الكل', this)">الكل</button>
-            <button class="cat-btn" onclick="filterCategory('مشروبات', this)">مشروبات</button>
-            <button class="cat-btn" onclick="filterCategory('مقرمشات', this)">مقرمشات</button>
-            <button class="cat-btn" onclick="filterCategory('حلويات', this)">حلويات</button>
-            <button class="cat-btn" onclick="filterCategory('ألبان', this)">ألبان</button>
+            <button class="cat-btn active" onclick="filterCategory('Tous', this)">Tous</button>
+            <button class="cat-btn" onclick="filterCategory('Boissons', this)">Boissons</button>
+            <button class="cat-btn" onclick="filterCategory('Chips', this)">Chips</button>
+            <button class="cat-btn" onclick="filterCategory('Chocolats', this)">Chocolats</button>
+            <button class="cat-btn" onclick="filterCategory('Laitiers', this)">Laitiers</button>
+            <button class="cat-btn" onclick="filterCategory('Couches', this)">Couches</button>
         </div>
 
         <div class="products-container" id="productsList"></div>
 
         <div class="cart-summary">
             <div class="summary-row">
-                <span>مجموع الزبون (الطوطال):</span>
-                <b id="total-sell" style="color: var(--primary);">0 دج</b>
+                <span>Total Client:</span>
+                <b id="total-sell" style="color: var(--primary);">0 DA</b>
             </div>
             <div class="actions-group">
-                <button class="btn-reset" onclick="resetCart()">مسح السلة</button>
-                <button class="btn-checkout" onclick="checkout()">إتمام وإرسال الفاتورة 🧾</button>
+                <button class="btn-reset" onclick="resetCart()">Vider</button>
+                <button class="btn-checkout" onclick="checkout()">Valider & Envoyer la Facture 🧾</button>
             </div>
         </div>
     </div>
 
-    <!-- 2. تبويب إضافة منتج -->
+    <!-- 2. Tab Ajouter Produit -->
     <div id="tab-add" class="tab-content">
-        <h2>➕ إضافة منتج جديد</h2>
+        <h2>➕ Nouveau Produit</h2>
         <div class="form-card">
             <div class="form-group">
-                <label>اسم المنتج:</label>
-                <input type="text" id="newName" placeholder="مثال: شوكولاتة كيندر">
+                <label>Nom du Produit:</label>
+                <input type="text" id="newName" placeholder="Ex: Kinder Bueno">
             </div>
             <div class="form-group">
-                <label>الفئة:</label>
+                <label>Catégorie:</label>
                 <select id="newCategory">
-                    <option value="مشروبات">مشروبات</option>
-                    <option value="مقرمشات">مقرمشات</option>
-                    <option value="حلويات">حلويات</option>
-                    <option value="ألبان">ألبان</option>
+                    <option value="Boissons">Boissons</option>
+                    <option value="Chips">Chips</option>
+                    <option value="Chocolats">Chocolats</option>
+                    <option value="Laitiers">Laitiers</option>
+                    <option value="Couches">Couches</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>صورة مصغرة (إيموجي):</label>
-                <input type="text" id="newIcon" placeholder="🍫 أو 🧃 أو 🍪" value="📦">
+                <label>Icône (Emoji):</label>
+                <input type="text" id="newIcon" placeholder="🍫 ou 🥤" value="📦">
             </div>
             <div class="form-group">
-                <label>رأس المال (سعر الشراء):</label>
+                <label>Prix d'Achat (Capital):</label>
                 <input type="number" id="newCost" placeholder="0">
             </div>
             <div class="form-group">
-                <label>سعر البيع:</label>
+                <label>Prix de Vente:</label>
                 <input type="number" id="newSell" placeholder="0">
             </div>
-            <button class="btn-submit" onclick="addNewProduct()">حفظ وإضافة المنتج</button>
+            <button class="btn-submit" onclick="addNewProduct()">Enregistrer le Produit</button>
         </div>
     </div>
 
-    <!-- 3. تبويب تغيير الأسعار -->
+    <!-- 3. Tab Modifier Prix -->
     <div id="tab-prices" class="tab-content">
-        <h2>✏️ تغيير أسعار المنتجات</h2>
+        <h2>✏️ Modifier les Prix</h2>
         <div class="form-card">
             <div class="form-group">
-                <label>اختر المنتج:</label>
+                <label>Choisir le Produit:</label>
                 <select id="editProductSelect" onchange="loadProductData()"></select>
             </div>
             <div class="form-group">
-                <label>رأس المال الجديد:</label>
+                <label>Nouveau Prix d'Achat:</label>
                 <input type="number" id="editCost">
             </div>
             <div class="form-group">
-                <label>سعر البيع الجديد:</label>
+                <label>Nouveau Prix de Vente:</label>
                 <input type="number" id="editSell">
             </div>
-            <button class="btn-submit" onclick="updateProductPrice()" style="background: var(--success);">تحديث السعر</button>
+            <button class="btn-submit" onclick="updateProductPrice()" style="background: var(--success);">Mettre à jour</button>
         </div>
     </div>
 
-    <!-- شريط التنقل السفلي -->
+    <!-- Navigation en bas -->
     <nav class="bottom-nav">
         <button class="nav-item active" onclick="switchTab('tab-sell', this)">
-            <span>🛒</span>البيع
+            <span>🛒</span>Vente
         </button>
         <button class="nav-item" onclick="switchTab('tab-add', this)">
-            <span>➕</span>إضافة منتج
+            <span>➕</span>Ajouter
         </button>
         <button class="nav-item" onclick="switchTab('tab-prices', this); populateEditSelect();">
-            <span>✏️</span>تغيير الأسعار
+            <span>✏️</span>Prix
         </button>
     </nav>
 
@@ -291,18 +294,41 @@
         tg.expand();
 
         let products = [
-            { id: 1, name: "كوكاكولا 1لتر", category: "مشروبات", icon: "🥤", cost: 100, sell: 120, qty: 0 },
-            { id: 2, name: "فانتا أورانج 1لتر", category: "مشروبات", icon: "🍊", cost: 100, sell: 120, qty: 0 },
-            { id: 3, name: "ماء بقارة 0.5لتر", category: "مشروبات", icon: "💧", cost: 20, sell: 25, qty: 0 },
-            { id: 4, name: "شيبس تشيبوس", category: "مقرمشات", icon: "🍟", cost: 25, sell: 30, qty: 0 },
-            { id: 5, name: "شيبس بيجو", category: "مقرمشات", icon: "🍿", cost: 12, sell: 15, qty: 0 },
-            { id: 6, name: "كوفريك ماكسون", category: "حلويات", icon: "🧇", cost: 15, sell: 20, qty: 0 },
-            { id: 7, name: "شكولاطة ريكورو", category: "حلويات", icon: "🍫", cost: 30, sell: 40, qty: 0 },
-            { id: 8, name: "حليب صومام 1لتر", category: "ألبان", icon: "🥛", cost: 45, sell: 50, qty: 0 },
-            { id: 9, name: "ياغورت صفا", category: "ألبان", icon: "🍮", cost: 20, sell: 25, qty: 0 }
+            // Boissons
+            { id: 1, name: "Coca-Cola 1L", category: "Boissons", icon: "🥤", cost: 100, sell: 120, qty: 0 },
+            { id: 2, name: "Fanta Orange 1L", category: "Boissons", icon: "🍊", cost: 100, sell: 120, qty: 0 },
+            { id: 3, name: "Hamoud Selecto 1L", category: "Boissons", icon: "🍾", cost: 90, sell: 110, qty: 0 },
+            { id: 4, name: "Rouiba Multifruits 1L", category: "Boissons", icon: "🧃", cost: 140, sell: 170, qty: 0 },
+            { id: 5, name: "Eau Pure 0.5L", category: "Boissons", icon: "💧", cost: 20, sell: 25, qty: 0 },
+            
+            // Chips
+            { id: 6, name: "Chips Cheetos", category: "Chips", icon: "🍟", cost: 25, sell: 30, qty: 0 },
+            { id: 7, name: "Chips Chipsos", category: "Chips", icon: "🍿", cost: 20, sell: 25, qty: 0 },
+            { id: 8, name: "Chips Salé (Discover)", category: "Chips", icon: "🥔", cost: 25, sell: 30, qty: 0 },
+            { id: 9, name: "Chips Fromage (Discover)", category: "Chips", icon: "🧀", cost: 25, sell: 30, qty: 0 },
+            { id: 10, name: "Koki / Pinguin", category: "Chips", icon: "🥨", cost: 12, sell: 15, qty: 0 },
+
+            // Chocolats & Biscuits
+            { id: 11, name: "Kinder Bueno", category: "Chocolats", icon: "🍫", cost: 120, sell: 150, qty: 0 },
+            { id: 12, name: "Maxi King", category: "Chocolats", icon: "🥮", cost: 90, sell: 120, qty: 0 },
+            { id: 13, name: "Snickers / Bounty", category: "Chocolats", icon: "🍬", cost: 60, sell: 80, qty: 0 },
+            { id: 14, name: "Choko Maxon", category: "Chocolats", icon: "🧇", cost: 15, sell: 20, qty: 0 },
+            { id: 15, name: "Ricoro Chocolat", category: "Chocolats", icon: "🍫", cost: 30, sell: 40, qty: 0 },
+            { id: 16, name: "Biscuits Bimo / Palma", category: "Chocolats", icon: "🍪", cost: 10, sell: 15, qty: 0 },
+
+            // Laitiers
+            { id: 17, name: "Lait Soummam 1L", category: "Laitiers", icon: "🥛", cost: 45, sell: 50, qty: 0 },
+            { id: 18, name: "Yaourt Danette", category: "Laitiers", icon: "🍮", cost: 30, sell: 40, qty: 0 },
+            { id: 19, name: "Yaourt Célia", category: "Laitiers", icon: "🥛", cost: 20, sell: 25, qty: 0 },
+            { id: 20, name: "Fromage La Vache qui Rit", category: "Laitiers", icon: "🧀", cost: 150, sell: 180, qty: 0 },
+
+            // Couches
+            { id: 21, name: "Couches Dalia Bébé T3", category: "Couches", icon: "👶", cost: 850, sell: 1000, qty: 0 },
+            { id: 22, name: "Couches Dalia Bébé T4", category: "Couches", icon: "👶", cost: 950, sell: 1150, qty: 0 },
+            { id: 23, name: "Couches Hana T3/T4", category: "Couches", icon: "🍼", cost: 800, sell: 950, qty: 0 }
         ];
 
-        let currentCategory = 'الكل';
+        let currentCategory = 'Tous';
         let searchQuery = '';
 
         function switchTab(tabId, btnElement) {
@@ -317,13 +343,13 @@
             listDiv.innerHTML = '';
 
             const filtered = products.filter(p => {
-                const matchesCat = currentCategory === 'الكل' || p.category === currentCategory;
+                const matchesCat = currentCategory === 'Tous' || p.category === currentCategory;
                 const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
                 return matchesCat && matchesSearch;
             });
 
             if (filtered.length === 0) {
-                listDiv.innerHTML = '<p style="text-align:center; color:#999; font-size:11px; margin:10px;">لا توجد منتجات مطابقة</p>';
+                listDiv.innerHTML = '<p style="text-align:center; color:#999; font-size:11px; margin:10px;">Aucun produit trouvé</p>';
                 return;
             }
 
@@ -334,7 +360,7 @@
                             <div class="product-icon">${p.icon || '📦'}</div>
                             <div class="product-info">
                                 <h4>${p.name}</h4>
-                                <p>بيع: ${p.sell} دج | شراء: ${p.cost} دج</p>
+                                <p>Vente: ${p.sell} DA | Achat: ${p.cost} DA</p>
                             </div>
                         </div>
                         <div class="controls">
@@ -378,13 +404,13 @@
             });
             let profit = tSell - tCost;
 
-            document.getElementById('total-sell').innerText = tSell + ' دج';
-            document.getElementById('wallet-cost').innerText = tCost + ' دج';
-            document.getElementById('wallet-profit').innerText = profit + ' دج';
+            document.getElementById('total-sell').innerText = tSell + ' DA';
+            document.getElementById('wallet-cost').innerText = tCost + ' DA';
+            document.getElementById('wallet-profit').innerText = profit + ' DA';
         }
 
         function resetCart() {
-            if (confirm("مسح السلة الحالية؟")) {
+            if (confirm("Voulez-vous vider le panier ?")) {
                 products.forEach(p => p.qty = 0);
                 renderProducts();
             }
@@ -398,14 +424,14 @@
             const sell = parseFloat(document.getElementById('newSell').value);
 
             if (!name || isNaN(cost) || isNaN(sell)) {
-                alert("الرجاء ملء جميع الحقول بشكل صحيح!");
+                alert("Veuillez remplir tous les champs correctement !");
                 return;
             }
 
             const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
             products.push({ id: newId, name, category, icon, cost, sell, qty: 0 });
 
-            alert("تمت إضافة المنتج بنجاح!");
+            alert("Produit ajouté avec succès !");
             document.getElementById('newName').value = '';
             document.getElementById('newCost').value = '';
             document.getElementById('newSell').value = '';
@@ -418,7 +444,7 @@
             const select = document.getElementById('editProductSelect');
             select.innerHTML = '';
             products.forEach(p => {
-                select.innerHTML += `<option value="${p.id}">${p.icon} ${p.name} (بيع: ${p.sell}دج)</option>`;
+                select.innerHTML += `<option value="${p.id}">${p.icon} ${p.name} (Vente: ${p.sell}DA)</option>`;
             });
             loadProductData();
         }
@@ -441,45 +467,19 @@
             if (p && !isNaN(cost) && !isNaN(sell)) {
                 p.cost = cost;
                 p.sell = sell;
-                alert("تم تحديث السعر بنجاح!");
+                alert("Prix mis à jour avec succès !");
                 switchTab('tab-sell', document.querySelector('.nav-item'));
                 renderProducts();
             } else {
-                alert("الرجاء إدخال أرقام صحيحة!");
+                alert("Veuillez entrer des chiffres valides !");
             }
         }
 
         function checkout() {
             let tSell = 0;
             let tCost = 0;
-            let summaryText = "📦 ─── **فاتورة مبيعات جديدة** ─── 📦\n\n";
+            let summaryText = "📦 ─── **FACTURE DE VENTE** ─── 📦\n\n";
             
             products.forEach(p => {
                 if (p.qty > 0) {
-                    summaryText += `▪️ ${p.name} × ${p.qty} = *${p.sell * p.qty} دج*\n`;
-                    tSell += p.sell * p.qty;
-                    tCost += p.cost * p.qty;
-                }
-            });
-
-            if (tSell === 0) {
-                alert("السلة فارغة!");
-                return;
-            }
-
-            let profit = tSell - tCost;
-
-            summaryText += `\n─────────────────────\n`;
-            summaryText += `💰 **السعر الإجمالي (الطوطال):** \`${tSell} دج\`\n`;
-            summaryText += `📈 **الفايدة الصافية:** \`${profit} دج\`\n`;
-            summaryText += `🔒 **رأس المال:** \`${tCost} دج\`\n`;
-            summaryText += `─────────────────────`;
-
-            tg.sendData(summaryText);
-            tg.close();
-        }
-
-        renderProducts();
-    </script>
-</body>
-</html>
+                    summaryText += `▪️ ${p.nam
