@@ -1,4 +1,4 @@
-             import logging
+import logging
 import sqlite3
 from telegram import (
     InlineKeyboardButton,
@@ -181,9 +181,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def register_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
   query = update.callback_query
   await query.answer()
-  context.user_data["photos"] = []  # تفريغ قائمة الصور المبدئية
+  context.user_data["photos"] = []
   await query.edit_message_text(
-      "📝 **بداية التسجيل في المنصة:**\n\nالرجاء إرسال **اسمك الكامل** أو اللقب المهني في رسالة:"
+      "📝 **بداية التسجيل في المنصة:**\n\nالرجاء إرسال **اسمك الكامل** أو اللقب"
+      " المهني في رسالة:"
   )
   return NAME
 
@@ -191,7 +192,8 @@ async def register_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def get_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
   context.user_data["name"] = update.message.text
   await update.message.reply_text(
-      "ممتاز! 🛠️ الآن، ما هو **تخصصك** أو مهنتك؟\n(مثال: سباك، بناء، ديباناج، كيمي...)"
+      "ممتاز! 🛠️ الآن، ما هو **تخصصك** أو مهنتك؟\n(مثال: سباك، بناء، ديباناج،"
+      " كيمي...)"
   )
   return SPECIALTY
 
@@ -199,7 +201,8 @@ async def get_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def get_specialty(update: Update, context: ContextTypes.DEFAULT_TYPE):
   context.user_data["specialty"] = update.message.text
   await update.message.reply_text(
-      "📍 في أي **ولاية** تنشط وتقدم خدماتك؟\n(مثال: الجزائر، البويرة، وهران، البليدة...)"
+      "📍 في أي **ولاية** تنشط وتقدم خدماتك؟\n(مثال: الجزائر، البويرة، وهران،"
+      " البليدة...)"
   )
   return WILAYA
 
@@ -207,7 +210,6 @@ async def get_specialty(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def get_wilaya(update: Update, context: ContextTypes.DEFAULT_TYPE):
   context.user_data["wilaya"] = update.message.text
 
-  # زر تفاعلي لتسهيل مشاركة رقم الهاتف مباشرة بضغطة زر
   phone_keyboard = [
       [KeyboardButton("📱 اضغط هنا لمشاركة رقم هاتفي", request_contact=True)]
   ]
@@ -232,8 +234,9 @@ async def get_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
   await update.message.reply_text(
       "📸 **صور الأعمال السابقة (Portfolio):**\n"
-      "الآن، أرسل صوراً لأعمالك السابقة (يمكنك إرسال صورة واحدة أو عدة صور تباعاً).\n"
-      "عندما تنهي إرسال الصور، اكتب كلمة **تم** في الخانة المربعة للرسائل.",
+      "الآن، أرسل صوراً لأعمالك السابقة (يمكنك إرسال صورة واحدة أو عدة صور"
+      " تباعاً).\nعندما تنهي إرسال الصور، اكتب كلمة **تم** في الخانة المربعة"
+      " للرسائل.",
       reply_markup=ReplyKeyboardRemove(),
   )
   return PHOTOS
@@ -241,7 +244,6 @@ async def get_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def get_photos(update: Update, context: ContextTypes.DEFAULT_TYPE):
   if update.message.photo:
-    # حفظ معرف الصورة الأفضل جودة
     photo_file_id = update.message.photo[-1].file_id
     context.user_data["photos"].append(photo_file_id)
     await update.message.reply_text(
@@ -258,7 +260,6 @@ async def get_photos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     phone = user_data.get("phone")
     photos_str = ",".join(user_data.get("photos", []))
 
-    # حفظ البيانات في قاعدة البيانات SQLite
     conn = sqlite3.connect("workers.db")
     cursor = conn.cursor()
     cursor.execute(
@@ -296,15 +297,13 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ================= الدالة الرئيسة لتشغيل البوت =================
 def main():
-  # تهيئة قاعدة البيانات أولاً
   init_db()
 
-  # ⚠️ ضع هنا التوكن الخاص بك المأخوذ من BotFather
-  TOKEN = "YOUR_BOT_TOKEN_HERE"
+  # تم وضع التوكن الخاص بك مباشرة هنا
+  TOKEN = "8678763432:AAFzxrJH8F_982KCi...إلخ"
 
   application = ApplicationBuilder().token(TOKEN).build()
 
-  # نظام المحادثة المتسلسلة لعملية التسجيل
   conv_handler = ConversationHandler(
       entry_points=[
           CallbackQueryHandler(register_start, pattern="^start_register$"),
@@ -322,7 +321,6 @@ def main():
       fallbacks=[CommandHandler("cancel", cancel)],
   )
 
-  # ربط الأوامر والمعالجات
   application.add_handler(CommandHandler("start", start))
   application.add_handler(conv_handler)
   application.add_handler(CallbackQueryHandler(button_handler))
