@@ -1,487 +1,336 @@
-<!DOCTYPE html>
-<html lang="fr" dir="ltr" id="htmlRoot">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Caissier DZ</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --primary: #0088cc;
-            --success: #28a745;
-            --danger: #dc3545;
-            --bg: #f4f6f9;
-            --card: #ffffff;
-            --text: #2c3e50;
-            --warning: #ffc107;
-        }
-        body {
-            font-family: Tahoma, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 8px;
-            padding-bottom: 65px;
-        }
-        
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-        h2 {
-            color: var(--primary);
-            font-size: 15px;
-            margin: 0;
-        }
-        .lang-btn {
-            background: #ffffff;
-            border: 1px solid #ced4da;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+             import logging
+import sqlite3
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+    Update,
+)
+from telegram.ext import (
+    ApplicationBuilder,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
 
-        .wallets-container {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 6px;
-        }
-        .wallet-box {
-            flex: 1;
-            padding: 5px;
-            border-radius: 8px;
-            text-align: center;
-            color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .wallet-capital { background: linear-gradient(135deg, #6c757d, #495057); }
-        .wallet-profit { background: linear-gradient(135deg, #28a745, #1e7e34); }
-        .wallet-box span { display: block; font-size: 9px; opacity: 0.9; }
-        .wallet-box h3 { margin: 2px 0 0 0; font-size: 12px; }
+# 1. إعداد التسجيل (Logging)
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
-        /* قسم إدارة وسحب الأرباح ورأس المال */
-        .manager-card {
-            background: var(--card);
-            padding: 8px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin-bottom: 6px;
-            font-size: 11px;
-        }
-        .manager-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: var(--primary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .manager-row {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 4px;
-        }
-        .manager-row input {
-            flex: 1;
-            padding: 4px 6px;
-            font-size: 11px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            outline: none;
-        }
-        .manager-row button {
-            padding: 4px 8px;
-            font-size: 10px;
-            font-weight: bold;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            color: white;
-        }
-        .btn-withdraw-profit { background-color: var(--success); }
-        .btn-withdraw-capital { background-color: #6c757d; }
+# حالات التسجيل عبر البوت (States)
+NAME, SPECIALTY, WILAYA, PHONE, PHOTOS = range(5)
 
-        .search-box {
-            width: 100%;
-            padding: 7px 10px;
-            font-size: 13px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            margin-bottom: 6px;
-            box-sizing: border-box;
-            outline: none;
-            background: #fff;
-        }
-        .categories {
-            display: flex;
-            gap: 4px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            margin-bottom: 6px;
-        }
-        .cat-btn {
-            background: #e9ecef;
-            border: none;
-            padding: 5px 9px;
-            border-radius: 12px;
-            font-size: 11px;
-            cursor: pointer;
-            white-space: nowrap;
-            color: #495057;
-        }
-        .cat-btn.active { background: var(--primary); color: white; font-weight: bold; }
-        
-        .products-container { max-height: 28vh; overflow-y: auto; }
-        .product-card {
-            background: var(--card);
-            padding: 6px 8px;
-            margin-bottom: 5px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        html[dir="ltr"] .product-card { border-left: 3px solid var(--primary); }
-        html[dir="rtl"] .product-card { border-right: 3px solid var(--primary); }
 
-        .product-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .product-icon {
-            font-size: 20px;
-            width: 28px;
-            text-align: center;
-        }
-        .product-info h4 { margin: 0 0 2px 0; font-size: 12px; }
-        .product-info p { margin: 0; font-size: 10px; color: #6c757d; }
-        
-        .controls { display: flex; align-items: center; gap: 6px; }
-        .qty-btn {
-            border: none; width: 26px; height: 26px; border-radius: 50%;
-            font-size: 14px; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; color: white;
-        }
-        .btn-plus { background-color: var(--success); }
-        .btn-minus { background-color: var(--danger); }
-        .qty-num { font-weight: bold; font-size: 13px; min-width: 18px; text-align: center; }
-        
-        .cart-summary {
-            background: var(--card);
-            padding: 6px 8px;
-            margin-top: 6px;
-            border-radius: 8px;
-            box-shadow: 0 -1px 5px rgba(0,0,0,0.05);
-        }
-        .summary-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 12px; }
-        .actions-group { display: flex; gap: 5px; margin-top: 5px; }
-        .btn-checkout {
-            flex: 2; background: var(--success); color: white; border: none;
-            padding: 8px; font-size: 12px; font-weight: bold; border-radius: 6px; cursor: pointer;
-        }
-        .btn-reset {
-            flex: 1; background: var(--danger); color: white; border: none;
-            padding: 8px; font-size: 11px; border-radius: 6px; cursor: pointer;
-        }
+# 2. تهيئة قاعدة البيانات المحلية (SQLite)
+def init_db():
+  conn = sqlite3.connect("workers.db")
+  cursor = conn.cursor()
+  cursor.execute("""
+        CREATE TABLE IF NOT EXISTS workers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            name TEXT,
+            specialty TEXT,
+            wilaya TEXT,
+            phone TEXT,
+            photos TEXT
+        )
+    """)
+  conn.commit()
+  conn.close()
 
-        .form-card {
-            background: var(--card);
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-top: 5px;
-        }
-        .form-group { margin-bottom: 8px; text-align: inherit; }
-        .form-group label { display: block; font-size: 11px; margin-bottom: 2px; color: #555; }
-        .form-group input, .form-group select {
-            width: 100%; padding: 7px; font-size: 12px;
-            border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; background: #fff;
-        }
-        .btn-submit {
-            width: 100%; background: var(--primary); color: white; border: none;
-            padding: 9px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer;
-        }
 
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #ffffff;
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid #ddd;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-            z-index: 1000;
-        }
-        .nav-item {
-            flex: 1;
-            text-align: center;
-            padding: 8px 0;
-            font-size: 11px;
-            color: #6c757d;
-            cursor: pointer;
-            background: none;
-            border: none;
-        }
-        .nav-item.active {
-            color: var(--primary);
-            font-weight: bold;
-            border-top: 2px solid var(--primary);
-        }
-        .nav-item span { display: block; font-size: 15px; margin-bottom: 1px; }
-    </style>
-</head>
-<body id="bodyTag">
+# ================= دالة البداية (القائمة الرئيسية) =================
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  user_name = (
+      update.effective_user.first_name
+      if update.effective_user
+      else "مستخدم"
+  )
 
-    <!-- 1. واجهة البيع والمحافظ -->
-    <div id="tab-sell" class="tab-content active">
-        <div class="header-container">
-            <h2 id="uiTitle">🏪 Smart Caissier DZ</h2>
-            <button class="lang-btn" onclick="toggleLanguage()">🌐 <span id="langIndicator">FR</span></button>
-        </div>
+  welcome_text = (
+      f"مرحباً بك يا {user_name} في منصة الخدمات الجزائرية الشاملة 🇩🇿\n\n"
+      "هذا البوت يربطك مباشرة بالحرفيين، شاحنات القطر (الديباناج)، وعمال اليومية (الكيمي).\n\n"
+      "اختر ما تبحث عنه من القائمة أدناه:"
+  )
 
-        <div class="wallets-container">
-            <div class="wallet-box wallet-capital">
-                <span id="uiCapText">Capital (Achat)</span>
-                <h3 id="wallet-cost">0 DA</h3>
-            </div>
-            <div class="wallet-box wallet-profit">
-                <span id="uiProfText">Bénéfice Net</span>
-                <h3 id="wallet-profit">0 DA</h3>
-            </div>
-        </div>
+  keyboard = [
+      [
+          InlineKeyboardButton(
+              "🛠️ المهن والحرف (بناء، بلومبي...)", callback_data="jobs_menu"
+          )
+      ],
+      [
+          InlineKeyboardButton(
+              "🚨 طوارئ الطريق (Dépanneuse)", callback_data="depannage_menu"
+          )
+      ],
+      [
+          InlineKeyboardButton(
+              "👷‍♂️ ركن الكيمي وعمال اليومية", callback_data="manasseur_menu"
+          )
+      ],
+      [
+          InlineKeyboardButton(
+              "📝 تسجيل كحرفي / عامل جديد", callback_data="start_register"
+          )
+      ],
+  ]
+  reply_markup = InlineKeyboardMarkup(keyboard)
 
-        <!-- صندوق سحب وإدارة الأرباح ورأس المال -->
-        <div class="manager-card">
-            <div class="manager-title">
-                <span id="uiManagerTitle">💼 Gestion du Mois & Trésorerie</span>
-                <span id="monthlyAccumulated" style="color: var(--success); font-size: 12px;">Mois: 0 DA</span>
-            </div>
-            <div class="manager-row">
-                <input type="number" id="profitWithdrawInput" placeholder="Montant bénéfice à transférer...">
-                <button class="btn-withdraw-profit" onclick="transferProfit()" id="uiBtnTransferProfit">Verser Bénéfice</button>
-            </div>
-            <div class="manager-row">
-                <input type="number" id="capitalAdjustInput" placeholder="Ajuster/Retirer Capital...">
-                <button class="btn-withdraw-capital" onclick="adjustCapital()" id="uiBtnAdjustCapital">Modifier Capital</button>
-            </div>
-        </div>
+  if update.message:
+    await update.message.reply_text(welcome_text, reply_markup=reply_markup)
+  elif update.callback_query:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text(welcome_text, reply_markup=reply_markup)
 
-        <input type="text" id="searchBox" class="search-box" placeholder="🔍 Rechercher un produit..." oninput="filterProducts()">
 
-        <div class="categories" id="categoriesContainer">
-            <button class="cat-btn active" onclick="filterCategory('Tous', this)" id="catBtnAll">Tous</button>
-            <button class="cat-btn" onclick="filterCategory('Boissons', this)" id="catBtnDrink">Boissons</button>
-            <button class="cat-btn" onclick="filterCategory('Chips', this)" id="catBtnChips">Chips</button>
-            <button class="cat-btn" onclick="filterCategory('Chocolats', this)" id="catBtnChoco">Chocolats</button>
-            <button class="cat-btn" onclick="filterCategory('Laitiers', this)" id="catBtnMilk">Laitiers</button>
-            <button class="cat-btn" onclick="filterCategory('Couches', this)" id="catBtnCouches">Couches</button>
-        </div>
+# ================= أزرار القوائم الفرعية =================
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  query = update.callback_query
+  await query.answer()
+  data = query.data
 
-        <div class="products-container" id="productsList"></div>
+  if data == "jobs_menu":
+    text = (
+        "🛠️ **قسم المهن والحرف الحرة:**\nاختر التخصص الذي تبحث عنه أو تود عرضه:"
+    )
+    keyboard = [
+        [
+            InlineKeyboardButton("🧱 بناء / ماصو", callback_data="search_mason"),
+            InlineKeyboardButton(
+                "🔧 سباك / بلومبي", callback_data="search_plumber"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                "⚡ كهربائي / إلكتريسيان", callback_data="search_electrician"
+            ),
+            InlineKeyboardButton(
+                "🎨 صباغ / ديکوراتور", callback_data="search_painter"
+            ),
+        ],
+        [InlineKeyboardButton("⬅️ القائمة الرئيسية", callback_data="main_menu")],
+    ]
+    await query.edit_message_text(
+        text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="Markdown"
+    )
 
-        <div class="cart-summary">
-            <div class="summary-row">
-                <span id="uiTotalText">Total Client:</span>
-                <b id="total-sell" style="color: var(--primary);">0 DA</b>
-            </div>
-            <div class="actions-group">
-                <button class="btn-reset" onclick="resetCart()" id="uiResetBtn">Vider</button>
-                <button class="btn-checkout" onclick="checkout()" id="uiCheckoutBtn">Valider & Envoyer 🧾</button>
-            </div>
-        </div>
-    </div>
+  elif data == "depannage_menu":
+    text = (
+        "🚨 **طوارئ الطريق (Dépanneuse & Remorquage):**\n"
+        "هل تعطلت سيارتك؟ اختر الخدمة المطلوبة:"
+    )
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                "🚚 البحث عن Dépanneuse قريب", callback_data="find_depannage"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "🛠️ ميكانيكي طوارئ في عين المكان", callback_data="road_mechanic"
+            )
+        ],
+        [InlineKeyboardButton("⬅️ القائمة الرئيسية", callback_data="main_menu")],
+    ]
+    await query.edit_message_text(
+        text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="Markdown"
+    )
 
-    <!-- 2. واجهة إضافة منتج -->
-    <div id="tab-add" class="tab-content">
-        <h2 id="uiAddTitle">➕ Nouveau Produit</h2>
-        <div class="form-card">
-            <div class="form-group">
-                <label id="uiLabelName">Nom du Produit:</label>
-                <input type="text" id="newName" placeholder="Ex: Kinder Bueno">
-            </div>
-            <div class="form-group">
-                <label id="uiLabelCat">Catégorie:</label>
-                <select id="newCategory">
-                    <option value="Boissons" id="uiOptDrink">Boissons</option>
-                    <option value="Chips" id="uiOptChips">Chips</option>
-                    <option value="Chocolats" id="uiOptChoco">Chocolats</option>
-                    <option value="Laitiers" id="uiOptMilk">Laitiers</option>
-                    <option value="Couches" id="uiOptCouches">Couches</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label id="uiLabelIcon">Icône (Emoji):</label>
-                <input type="text" id="newIcon" value="📦">
-            </div>
-            <div class="form-group">
-                <label id="uiLabelCost">Prix d'Achat (Capital):</label>
-                <input type="number" id="newCost" placeholder="0">
-            </div>
-            <div class="form-group">
-                <label id="uiLabelSell">Prix de Vente:</label>
-                <input type="number" id="newSell" placeholder="0">
-            </div>
-            <button class="btn-submit" onclick="addNewProduct()" id="uiBtnSave">Enregistrer le Produit</button>
-        </div>
-    </div>
+  elif data == "manasseur_menu":
+    text = (
+        "👷‍♂️ **ركن الكيمي وعمال اليومية:**\n"
+        "مخصص لمن يبحث عن عامل (مانوفري) لمساعدته في ورشة أو شغل مؤقت."
+    )
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                "🔍 عرض العمال المتاحين (قريباً)", callback_data="show_workers"
+            )
+        ],
+        [InlineKeyboardButton("⬅️ القائمة الرئيسية", callback_data="main_menu")],
+    ]
+    await query.edit_message_text(
+        text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="Markdown"
+    )
 
-    <!-- 3. واجهة تعديل الأسعار -->
-    <div id="tab-prices" class="tab-content">
-        <h2 id="uiEditTitle">✏️ Modifier les Prix</h2>
-        <div class="form-card">
-            <div class="form-group">
-                <label id="uiLabelSelect">Choisir le Produit:</label>
-                <select id="editProductSelect" onchange="loadProductData()"></select>
-            </div>
-            <div class="form-group">
-                <label id="uiLabelNewCost">Nouveau Prix d'Achat:</label>
-                <input type="number" id="editCost">
-            </div>
-            <div class="form-group">
-                <label id="uiLabelNewSell">Nouveau Prix de Vente:</label>
-                <input type="number" id="editSell">
-            </div>
-            <button class="btn-submit" onclick="updateProductPrice()" style="background: var(--success);" id="uiBtnUpdate">Mettre à jour</button>
-        </div>
-    </div>
+  elif data == "main_menu":
+    await start(update, context)
 
-    <!-- الشريط السفلي -->
-    <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchTab('tab-sell', this)" id="navSellBtn">
-            <span>🛒</span><span id="uiNavSell">Vente</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('tab-add', this)" id="navAddBtn">
-            <span>➕</span><span id="uiNavAdd">Ajouter</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('tab-prices', this); populateEditSelect();" id="navPricesBtn">
-            <span>✏️</span><span id="uiNavPrices">Prix</span>
-        </button>
-    </nav>
+  elif data == "find_depannage" or data.startswith("search_"):
+    await query.edit_message_text(
+        "📍 عذراً، هذه الخصائص يتم تحديثها حسب ولايتك.\n"
+        "يمكنك التسجيل مباشرة كحرفي لكي يراك الزبائن.\n\n"
+        "👇 للعودة للقائمة الرئيسية:",
+        reply_markup=InlineKeyboardMarkup(
+            [[InlineKeyboardButton("⬅️ رجوع", callback_data="main_menu")]]
+        ),
+    )
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
 
-        let currentLang = 'fr';
-        let monthlySavedProfit = 0; // محفظة الأرباح الشهرية التراكمية
-        let manualCapitalAdjustment = 0; // التعديلات اليدوية على رأس المال
+# ================= نظام التسجيل خطوة بخطوة (ConversationHandler) =================
+async def register_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  query = update.callback_query
+  await query.answer()
+  context.user_data["photos"] = []  # تفريغ قائمة الصور المبدئية
+  await query.edit_message_text(
+      "📝 **بداية التسجيل في المنصة:**\n\nالرجاء إرسال **اسمك الكامل** أو اللقب المهني في رسالة:"
+  )
+  return NAME
 
-        const langData = {
-            fr: {
-                title: "🏪 Smart Caissier DZ",
-                cap: "Capital (Achat)",
-                prof: "Bénéfice Net",
-                managerTitle: "💼 Gestion du Mois & Trésorerie",
-                monthlyText: "Mois:",
-                btnTransferProfit: "Verser Bénéfice",
-                btnAdjustCapital: "Modifier Capital",
-                placeholderProfit: "Montant bénéfice à transférer...",
-                placeholderCapital: "Ajuster/Retirer Capital (+/-)...",
-                search: "🔍 Rechercher un produit...",
-                all: "Tous",
-                drink: "Boissons",
-                chips: "Chips",
-                choco: "Chocolats",
-                milk: "Laitiers",
-                couches: "Couches",
-                total: "Total Client:",
-                reset: "Vider",
-                checkout: "Valider & Envoyer 🧾",
-                addTitle: "➕ Nouveau Produit",
-                lblName: "Nom du Produit:",
-                lblCat: "Catégorie:",
-                lblIcon: "Icône (Emoji):",
-                lblCost: "Prix d'Achat (Capital):",
-                lblSell: "Prix de Vente:",
-                btnSave: "Enregistrer le Produit",
-                editTitle: "✏️ Modifier les Prix",
-                lblSelect: "Choisir le Produit:",
-                lblNewCost: "Nouveau Prix d'Achat:",
-                lblNewSell: "Nouveau Prix de Vente:",
-                btnUpdate: "Mettre à jour",
-                navSell: "Vente",
-                navAdd: "Ajouter",
-                navPrices: "Prix",
-                txtSell: "Vente",
-                txtCost: "Achat",
-                emptyCart: "Le panier est vide !",
-                emptyList: "Aucun produit trouvé",
-                msgAdded: "Produit ajouté avec succès !",
-                msgUpdated: "Prix mis à jour avec succès !",
-                msgReset: "Voulez-vous vider le panier ?",
-                msgFill: "Veuillez remplir tous les champs correctement !",
-                msgNum: "Veuillez entrer des chiffres valides !",
-                msgSuccessTransfer: "Bénéfice versé vers le total du mois avec succès !",
-                msgSuccessCapital: "Capital mis à jour avec succès !",
-                msgErrorAmount: "Veuillez entrer un montant valide !"
-            },
-            ar: {
-                title: "🏪 الصندوق الذكي الجزائر",
-                cap: "رأس المال (الشراء)",
-                prof: "صافي الربح",
-                managerTitle: "💼 إدارة الأرباح الشهرية ورأس المال",
-                monthlyText: "الشهر:",
-                btnTransferProfit: "تحويل للربح الشهري",
-                btnAdjustCapital: "تعديل رأس المال",
-                placeholderProfit: "مبلغ الفائدة المراد نقله...",
-                placeholderCapital: "تعديل رأس المال (+ أو -)...",
-                search: "🔍 ابحث عن منتج...",
-                all: "الكل",
-                drink: "المشروبات",
-                chips: "الشيبس",
-                choco: "الشوكولاتة",
-                milk: "الألبان",
-                couches: "الحفاضات",
-                total: "المجموع الكلي:",
-                reset: "إفراغ",
-                checkout: "إرسال الفاتورة 🧾",
-                addTitle: "➕ إضافة منتج جديد",
-                lblName: "اسم المنتج:",
-                lblCat: "التصنيف:",
-                lblIcon: "الأيقونة (Emoji):",
-                lblCost: "سعر الشراء (رأس المال):",
-                lblSell: "سعر البيع:",
-                btnSave: "حفظ المنتج",
-                editTitle: "✏️ تعديل الأسعار",
-                lblSelect: "اختر المنتج:",
-                lblNewCost: "سعر الشراء الجديد:",
-                lblNewSell: "سعر البيع الجديد:",
-                btnUpdate: "تحديث السعر",
-                navSell: "البيع",
-                navAdd: "إضافة",
-                navPrices: "الأسعار",
-                txtSell: "البيع",
-                txtCost: "الشراء",
-                emptyCart: "السلة فارغة!",
-                emptyList: "لم يتم العثور على منتجات",
-                msgAdded: "تم إضافة المنتج بنجاح!",
-                msgUpdated: "تم تحديث السعر بنجاح!",
-                msgReset: "هل تريد إفراغ السلة؟",
-                msgFill: "الرجاء ملء جميع الحقول بشكل صحيح!",
-                msgNum: "الرجاء إدخال أرقام صحيحة!",
-                msgSuccessTransfer: "تم تحويل المبلغ إلى محفظة الأرباح الشهرية بنجاح!",
-                msgSuccessCapital: "تم تحديث رأس المال بنجاح!",
-                msgErrorAmount: "الرجاء إدخال مبلغ صحيح!"
-            }
-        };
 
-        let products = [
-            { id: 1, nameFr: "Coca-Cola / Michifota 1L", nameAr: "كوكاكولا / مشيفوطا 1 لتر", category: "Boissons", icon: "🥤", cost: 100, sell: 120, qty: 0 },
-            { id: 2, nameFr: "Fanta Orange / Orangina", nameAr: "فانتا أورنج / أورونج", category: "Boissons", icon: "🍊", cost: 100, sell: 120, qty: 0 },
-            { id: 3, nameFr: "Fontachina / Hamoud Selecto 1L", nameAr: "فونطاشينا / حمود سيلكتو 1 لتر", category: "Boissons", icon: "🍾", cost: 90, sell: 110, qty: 0 },
-            { id: 4, nameFr: "Rouiba Multifruits 1L", nameAr: "رويبة فواكه مشكلة 1 لتر", category: "Boissons", icon: "🧃", cost: 140, sell: 170, qty: 0 },
-            { id: 5, nameFr: "Eau Pure 0.5L", nameAr: "ماء صافي 0.5 لتر", category: "Boissons", icon: "💧", cost: 20, sell: 25, qty: 0 },
-            
-            { id: 6, nameFr: "Chips Cheetos
+async def get_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  context.user_data["name"] = update.message.text
+  await update.message.reply_text(
+      "ممتاز! 🛠️ الآن، ما هو **تخصصك** أو مهنتك؟\n(مثال: سباك، بناء، ديباناج، كيمي...)"
+  )
+  return SPECIALTY
+
+
+async def get_specialty(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  context.user_data["specialty"] = update.message.text
+  await update.message.reply_text(
+      "📍 في أي **ولاية** تنشط وتقدم خدماتك؟\n(مثال: الجزائر، البويرة، وهران، البليدة...)"
+  )
+  return WILAYA
+
+
+async def get_wilaya(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  context.user_data["wilaya"] = update.message.text
+
+  # زر تفاعلي لتسهيل مشاركة رقم الهاتف مباشرة بضغطة زر
+  phone_keyboard = [
+      [KeyboardButton("📱 اضغط هنا لمشاركة رقم هاتفي", request_contact=True)]
+  ]
+  reply_markup = ReplyKeyboardMarkup(
+      phone_keyboard, one_time_keyboard=True, resize_keyboard=True
+  )
+
+  await update.message.reply_text(
+      "📞 أرسل **رقم هاتفك** أو اضغط على الزر أدناه لمشاركته:",
+      reply_markup=reply_markup,
+  )
+  return PHONE
+
+
+async def get_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  if update.message.contact:
+    phone = update.message.contact.phone_number
+  else:
+    phone = update.message.text
+
+  context.user_data["phone"] = phone
+
+  await update.message.reply_text(
+      "📸 **صور الأعمال السابقة (Portfolio):**\n"
+      "الآن، أرسل صوراً لأعمالك السابقة (يمكنك إرسال صورة واحدة أو عدة صور تباعاً).\n"
+      "عندما تنهي إرسال الصور، اكتب كلمة **تم** في الخانة المربعة للرسائل.",
+      reply_markup=ReplyKeyboardRemove(),
+  )
+  return PHOTOS
+
+
+async def get_photos(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  if update.message.photo:
+    # حفظ معرف الصورة الأفضل جودة
+    photo_file_id = update.message.photo[-1].file_id
+    context.user_data["photos"].append(photo_file_id)
+    await update.message.reply_text(
+        "✅ تم استلام الصورة بنجاح. أرسل صورة أخرى أو اكتب **تم** للإنهاء."
+    )
+    return PHOTOS
+
+  elif update.message.text and update.message.text.lower() == "تم":
+    user_data = context.user_data
+    user_id = update.effective_user.id
+    name = user_data.get("name")
+    specialty = user_data.get("specialty")
+    wilaya = user_data.get("wilaya")
+    phone = user_data.get("phone")
+    photos_str = ",".join(user_data.get("photos", []))
+
+    # حفظ البيانات في قاعدة البيانات SQLite
+    conn = sqlite3.connect("workers.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO workers (user_id, name, specialty, wilaya, phone,"
+        " photos) VALUES (?, ?, ?, ?, ?, ?)",
+        (user_id, name, specialty, wilaya, phone, photos_str),
+    )
+    conn.commit()
+    conn.close()
+
+    summary = (
+        f"🎉 **تم تسجيلك بنجاح في المنصة!**\n\n"
+        f"👤 الاسم: {name}\n"
+        f"🛠️ التخصص: {specialty}\n"
+        f"📍 الولاية: {wilaya}\n"
+        f"📞 الهاتف: {phone}\n"
+        f"🖼️ الصور المرفوعة: {len(user_data.get('photos', []))} صورة\n\n"
+        "أصبحت الآن مسجلاً، وسيتمكن الزبائن من التواصل معك قريباً عبر البوت!"
+    )
+    await update.message.reply_text(summary)
+    return ConversationHandler.END
+  else:
+    await update.message.reply_text(
+        "الرجاء إرسال صورة لخدمتك السابقة، أو كتابة كلمة **تم** لإنهاء التسجيل."
+    )
+    return PHOTOS
+
+
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+  await update.message.reply_text(
+      "تم إلغاء عملية التسجيل.", reply_markup=ReplyKeyboardRemove()
+  )
+  return ConversationHandler.END
+
+
+# ================= الدالة الرئيسة لتشغيل البوت =================
+def main():
+  # تهيئة قاعدة البيانات أولاً
+  init_db()
+
+  # ⚠️ ضع هنا التوكن الخاص بك المأخوذ من BotFather
+  TOKEN = "YOUR_BOT_TOKEN_HERE"
+
+  application = ApplicationBuilder().token(TOKEN).build()
+
+  # نظام المحادثة المتسلسلة لعملية التسجيل
+  conv_handler = ConversationHandler(
+      entry_points=[
+          CallbackQueryHandler(register_start, pattern="^start_register$"),
+          CommandHandler("register", register_start),
+      ],
+      states={
+          NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_name)],
+          SPECIALTY: [
+              MessageHandler(filters.TEXT & ~filters.COMMAND, get_specialty)
+          ],
+          WILAYA: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_wilaya)],
+          PHONE: [MessageHandler(filters.TEXT | filters.CONTACT, get_phone)],
+          PHOTOS: [MessageHandler(filters.PHOTO | filters.TEXT, get_photos)],
+      },
+      fallbacks=[CommandHandler("cancel", cancel)],
+  )
+
+  # ربط الأوامر والمعالجات
+  application.add_handler(CommandHandler("start", start))
+  application.add_handler(conv_handler)
+  application.add_handler(CallbackQueryHandler(button_handler))
+
+  print("🤖 البوت يعمل الآن بنجاح وبدون أي نقص...")
+  application.run_polling()
+
+
+if __name__ == "__main__":
+  main()
+  
