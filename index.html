@@ -1,334 +1,199 @@
-import logging
-import sqlite3
-from telegram import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    KeyboardButton,
-    ReplyKeyboardMarkup,
-    ReplyKeyboardRemove,
-    Update,
-)
-from telegram.ext import (
-    ApplicationBuilder,
-    CallbackQueryHandler,
-    CommandHandler,
-    ContextTypes,
-    ConversationHandler,
-    MessageHandler,
-    filters,
-)
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة XO</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-# 1. إعداد التسجيل (Logging)
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
-logger = logging.getLogger(__name__)
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
 
-# حالات التسجيل عبر البوت (States)
-NAME, SPECIALTY, WILAYA, PHONE, PHOTOS = range(5)
+        h1 {
+            margin-bottom: 10px;
+            color: #38bdf8;
+        }
 
+        #status {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #cbd5e1;
+        }
 
-# 2. تهيئة قاعدة البيانات المحلية (SQLite)
-def init_db():
-  conn = sqlite3.connect("workers.db")
-  cursor = conn.cursor()
-  cursor.execute("""
-        CREATE TABLE IF NOT EXISTS workers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            name TEXT,
-            specialty TEXT,
-            wilaya TEXT,
-            phone TEXT,
-            photos TEXT
-        )
-    """)
-  conn.commit()
-  conn.close()
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 8px;
+            background-color: #334155;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
 
+        .cell {
+            background-color: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #f8fafc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
 
-# ================= دالة البداية (القائمة الرئيسية) =================
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-  user_name = (
-      update.effective_user.first_name
-      if update.effective_user
-      else "مستخدم"
-  )
+        .cell:hover {
+            background-color: #475569;
+        }
 
-  welcome_text = (
-      f"مرحباً بك يا {user_name} في منصة الخدمات الجزائرية الشاملة 🇩🇿\n\n"
-      "هذا البوت يربطك مباشرة بالحرفيين، شاحنات القطر (الديباناج)، وعمال اليومية (الكيمي).\n\n"
-      "اختر ما تبحث عنه من القائمة أدناه:"
-  )
+        .cell.x {
+            color: #ef4444;
+        }
 
-  keyboard = [
-      [
-          InlineKeyboardButton(
-              "🛠️ المهن والحرف (بناء، بلومبي...)", callback_data="jobs_menu"
-          )
-      ],
-      [
-          InlineKeyboardButton(
-              "🚨 طوارئ الطريق (Dépanneuse)", callback_data="depannage_menu"
-          )
-      ],
-      [
-          InlineKeyboardButton(
-              "👷‍♂️ ركن الكيمي وعمال اليومية", callback_data="manasseur_menu"
-          )
-      ],
-      [
-          InlineKeyboardButton(
-              "📝 تسجيل كحرفي / عامل جديد", callback_data="start_register"
-          )
-      ],
-  ]
-  reply_markup = InlineKeyboardMarkup(keyboard)
+        .cell.o {
+            color: #3b82f6;
+        }
 
-  if update.message:
-    await update.message.reply_text(welcome_text, reply_markup=reply_markup)
-  elif update.callback_query:
-    query = update.callback_query
-    await query.answer()
-    await query.edit_message_text(welcome_text, reply_markup=reply_markup)
+        #restartBtn {
+            margin-top: 25px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            background-color: #38bdf8;
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
 
+        #restartBtn:hover {
+            background-color: #0ea5e9;
+        }
+    </style>
+</head>
+<body>
 
-# ================= أزرار القوائم الفرعية =================
-async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-  query = update.callback_query
-  await query.answer()
-  data = query.data
+    <h1>لعبة XO</h1>
+    <div id="status">دور اللاعب: X</div>
 
-  if data == "jobs_menu":
-    text = (
-        "🛠️ **قسم المهن والحرف الحرة:**\nاختر التخصص الذي تبحث عنه أو تود عرضه:"
-    )
-    keyboard = [
-        [
-            InlineKeyboardButton("🧱 بناء / ماصو", callback_data="search_mason"),
-            InlineKeyboardButton(
-                "🔧 سباك / بلومبي", callback_data="search_plumber"
-            ),
-        ],
-        [
-            InlineKeyboardButton(
-                "⚡ كهربائي / إلكتريسيان", callback_data="search_electrician"
-            ),
-            InlineKeyboardButton(
-                "🎨 صباغ / ديکوراتور", callback_data="search_painter"
-            ),
-        ],
-        [InlineKeyboardButton("⬅️ القائمة الرئيسية", callback_data="main_menu")],
-    ]
-    await query.edit_message_text(
-        text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="Markdown"
-    )
+    <div class="board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
 
-  elif data == "depannage_menu":
-    text = (
-        "🚨 **طوارئ الطريق (Dépanneuse & Remorquage):**\n"
-        "هل تعطلت سيارتك؟ اختر الخدمة المطلوبة:"
-    )
-    keyboard = [
-        [
-            InlineKeyboardButton(
-                "🚚 البحث عن Dépanneuse قريب", callback_data="find_depannage"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                "🛠️ ميكانيكي طوارئ في عين المكان", callback_data="road_mechanic"
-            )
-        ],
-        [InlineKeyboardButton("⬅️ القائمة الرئيسية", callback_data="main_menu")],
-    ]
-    await query.edit_message_text(
-        text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="Markdown"
-    )
+    <button id="restartBtn" onclick="restartGame()">إعادة اللعب</button>
 
-  elif data == "manasseur_menu":
-    text = (
-        "👷‍♂️ **ركن الكيمي وعمال اليومية:**\n"
-        "مخصص لمن يبحث عن عامل (مانوفري) لمساعدته في ورشة أو شغل مؤقت."
-    )
-    keyboard = [
-        [
-            InlineKeyboardButton(
-                "🔍 عرض العمال المتاحين (قريباً)", callback_data="show_workers"
-            )
-        ],
-        [InlineKeyboardButton("⬅️ القائمة الرئيسية", callback_data="main_menu")],
-    ]
-    await query.edit_message_text(
-        text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="Markdown"
-    )
+    <script>
+        const board = document.getElementById('board');
+        const statusText = document.getElementById('status');
+        const cells = document.querySelectorAll('.cell');
 
-  elif data == "main_menu":
-    await start(update, context)
+        let options = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "X";
+        let isRunning = true;
 
-  elif data == "find_depannage" or data.startswith("search_"):
-    await query.edit_message_text(
-        "📍 عذراً، هذه الخصائص يتم تحديثها حسب ولايتك.\n"
-        "يمكنك التسجيل مباشرة كحرفي لكي يراك الزبائن.\n\n"
-        "👇 للعودة للقائمة الرئيسية:",
-        reply_markup=InlineKeyboardMarkup(
-            [[InlineKeyboardButton("⬅️ رجوع", callback_data="main_menu")]]
-        ),
-    )
+        const winConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
 
+        initializeGame();
 
-# ================= نظام التسجيل خطوة بخطوة (ConversationHandler) =================
-async def register_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-  query = update.callback_query
-  await query.answer()
-  context.user_data["photos"] = []
-  await query.edit_message_text(
-      "📝 **بداية التسجيل في المنصة:**\n\nالرجاء إرسال **اسمك الكامل** أو اللقب"
-      " المهني في رسالة:"
-  )
-  return NAME
+        function initializeGame() {
+            cells.forEach(cell => cell.addEventListener('click', cellClicked));
+            statusText.textContent = `دور اللاعب: ${currentPlayer}`;
+        }
 
+        function cellClicked() {
+            const cellIndex = this.getAttribute('data-index');
 
-async def get_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-  context.user_data["name"] = update.message.text
-  await update.message.reply_text(
-      "ممتاز! 🛠️ الآن، ما هو **تخصصك** أو مهنتك؟\n(مثال: سباك، بناء، ديباناج،"
-      " كيمي...)"
-  )
-  return SPECIALTY
+            if (options[cellIndex] !== "" || !isRunning) {
+                return;
+            }
 
+            updateCell(this, cellIndex);
+            checkWinner();
+        }
 
-async def get_specialty(update: Update, context: ContextTypes.DEFAULT_TYPE):
-  context.user_data["specialty"] = update.message.text
-  await update.message.reply_text(
-      "📍 في أي **ولاية** تنشط وتقدم خدماتك؟\n(مثال: الجزائر، البويرة، وهران،"
-      " البليدة...)"
-  )
-  return WILAYA
+        function updateCell(cell, index) {
+            options[index] = currentPlayer;
+            cell.textContent = currentPlayer;
+            cell.classList.add(currentPlayer.toLowerCase());
+        }
 
+        function changePlayer() {
+            currentPlayer = (currentPlayer === "X") ? "O" : "X";
+            statusText.textContent = `دور اللاعب: ${currentPlayer}`;
+        }
 
-async def get_wilaya(update: Update, context: ContextTypes.DEFAULT_TYPE):
-  context.user_data["wilaya"] = update.message.text
+        function checkWinner() {
+            let roundWon = false;
 
-  phone_keyboard = [
-      [KeyboardButton("📱 اضغط هنا لمشاركة رقم هاتفي", request_contact=True)]
-  ]
-  reply_markup = ReplyKeyboardMarkup(
-      phone_keyboard, one_time_keyboard=True, resize_keyboard=True
-  )
+            for (let i = 0; i < winConditions.length; i++) {
+                const condition = winConditions[i];
+                const cellA = options[condition[0]];
+                const cellB = options[condition[1]];
+                const cellC = options[condition[2]];
 
-  await update.message.reply_text(
-      "📞 أرسل **رقم هاتفك** أو اضغط على الزر أدناه لمشاركته:",
-      reply_markup=reply_markup,
-  )
-  return PHONE
+                if (cellA === "" || cellB === "" || cellC === "") {
+                    continue;
+                }
+                if (cellA === cellB && cellB === cellC) {
+                    roundWon = true;
+                    break;
+                }
+            }
 
+            if (roundWon) {
+                statusText.textContent = `اللاعب ${currentPlayer} فاز! 🎉`;
+                isRunning = false;
+            } else if (!options.includes("")) {
+                statusText.textContent = `تعادل! 🤝`;
+                isRunning = false;
+            } else {
+                changePlayer();
+            }
+        }
 
-async def get_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
-  if update.message.contact:
-    phone = update.message.contact.phone_number
-  else:
-    phone = update.message.text
-
-  context.user_data["phone"] = phone
-
-  await update.message.reply_text(
-      "📸 **صور الأعمال السابقة (Portfolio):**\n"
-      "الآن، أرسل صوراً لأعمالك السابقة (يمكنك إرسال صورة واحدة أو عدة صور"
-      " تباعاً).\nعندما تنهي إرسال الصور، اكتب كلمة **تم** في الخانة المربعة"
-      " للرسائل.",
-      reply_markup=ReplyKeyboardRemove(),
-  )
-  return PHOTOS
-
-
-async def get_photos(update: Update, context: ContextTypes.DEFAULT_TYPE):
-  if update.message.photo:
-    photo_file_id = update.message.photo[-1].file_id
-    context.user_data["photos"].append(photo_file_id)
-    await update.message.reply_text(
-        "✅ تم استلام الصورة بنجاح. أرسل صورة أخرى أو اكتب **تم** للإنهاء."
-    )
-    return PHOTOS
-
-  elif update.message.text and update.message.text.lower() == "تم":
-    user_data = context.user_data
-    user_id = update.effective_user.id
-    name = user_data.get("name")
-    specialty = user_data.get("specialty")
-    wilaya = user_data.get("wilaya")
-    phone = user_data.get("phone")
-    photos_str = ",".join(user_data.get("photos", []))
-
-    conn = sqlite3.connect("workers.db")
-    cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO workers (user_id, name, specialty, wilaya, phone,"
-        " photos) VALUES (?, ?, ?, ?, ?, ?)",
-        (user_id, name, specialty, wilaya, phone, photos_str),
-    )
-    conn.commit()
-    conn.close()
-
-    summary = (
-        f"🎉 **تم تسجيلك بنجاح في المنصة!**\n\n"
-        f"👤 الاسم: {name}\n"
-        f"🛠️ التخصص: {specialty}\n"
-        f"📍 الولاية: {wilaya}\n"
-        f"📞 الهاتف: {phone}\n"
-        f"🖼️ الصور المرفوعة: {len(user_data.get('photos', []))} صورة\n\n"
-        "أصبحت الآن مسجلاً، وسيتمكن الزبائن من التواصل معك قريباً عبر البوت!"
-    )
-    await update.message.reply_text(summary)
-    return ConversationHandler.END
-  else:
-    await update.message.reply_text(
-        "الرجاء إرسال صورة لخدمتك السابقة، أو كتابة كلمة **تم** لإنهاء التسجيل."
-    )
-    return PHOTOS
-
-
-async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-  await update.message.reply_text(
-      "تم إلغاء عملية التسجيل.", reply_markup=ReplyKeyboardRemove()
-  )
-  return ConversationHandler.END
-
-
-# ================= الدالة الرئيسة لتشغيل البوت =================
-def main():
-  init_db()
-
-  # تم وضع التوكن الخاص بك مباشرة هنا
-  TOKEN = "8678763432:AAFzxrJH8F_982KCi...إلخ"
-
-  application = ApplicationBuilder().token(TOKEN).build()
-
-  conv_handler = ConversationHandler(
-      entry_points=[
-          CallbackQueryHandler(register_start, pattern="^start_register$"),
-          CommandHandler("register", register_start),
-      ],
-      states={
-          NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_name)],
-          SPECIALTY: [
-              MessageHandler(filters.TEXT & ~filters.COMMAND, get_specialty)
-          ],
-          WILAYA: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_wilaya)],
-          PHONE: [MessageHandler(filters.TEXT | filters.CONTACT, get_phone)],
-          PHOTOS: [MessageHandler(filters.PHOTO | filters.TEXT, get_photos)],
-      },
-      fallbacks=[CommandHandler("cancel", cancel)],
-  )
-
-  application.add_handler(CommandHandler("start", start))
-  application.add_handler(conv_handler)
-  application.add_handler(CallbackQueryHandler(button_handler))
-
-  print("🤖 البوت يعمل الآن بنجاح وبدون أي نقص...")
-  application.run_polling()
-
-
-if __name__ == "__main__":
-  main()
-  
+        function restartGame() {
+            currentPlayer = "X";
+            options = ["", "", "", "", "", "", "", "", ""];
+            statusText.textContent = `دور اللاعب: ${currentPlayer}`;
+            cells.forEach(cell => {
+                cell.textContent = "";
+                cell.classList.remove('x', 'o');
+            });
+            isRunning = true;
+        }
+    </script>
+</body>
+</html>
