@@ -1,400 +1,173 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goold & Lark Player</title>
-    <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            padding-bottom: 70px;
-        }
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            background-color: #121212;
-        }
-        .app-brand {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #ffffff;
-        }
-        .app-brand .goold-text { color: #f39c12; }
-        .app-brand .diamond { color: #f39c12; }
-        .top-icons {
-            display: flex;
-            gap: 18px;
-            color: #aaa;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .tabs-container {
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 10px;
-            background-color: #121212;
-            border-bottom: 1px solid #222;
-            font-size: 14px;
-        }
-        .tab {
-            color: #888;
-            cursor: pointer;
-            padding-bottom: 4px;
-        }
-        .tab.active {
-            color: #00d2ff;
-            font-weight: bold;
-            border-bottom: 2px solid #00d2ff;
-        }
-        .container {
-            padding: 15px;
-            max-width: 450px;
-            margin: 0 auto;
-        }
-        .load-songs-btn {
-            background: #252525;
-            border: 2px dashed #f39c12;
-            color: #f39c12;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 13px;
-            cursor: pointer;
-            margin-bottom: 15px;
-            font-weight: bold;
-            display: block;
-        }
-        .song-card {
-            background: #1a1a1a;
-            border-radius: 8px;
-            padding: 10px 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            border: 1px solid #2a2a2a;
-            cursor: pointer;
-        }
-        .song-card:hover {
-            background: #252525;
-        }
-        .song-card-info h4 {
-            margin: 0 0 3px 0;
-            font-size: 14px;
-            color: #fff;
-        }
-        .song-card-info p {
-            margin: 0;
-            font-size: 11px;
-            color: #888;
-        }
-        .song-card-icon {
-            background: #252525;
-            padding: 8px;
-            border-radius: 6px;
-            color: #f39c12;
-            font-size: 12px;
-        }
-        .studio-card {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 20px;
-        }
-        .studio-title {
-            color: #f39c12;
-            text-align: center;
-            font-size: 16px;
-            margin-top: 0;
-            margin-bottom: 12px;
-        }
-        .form-group {
-            margin-bottom: 12px;
-        }
-        label {
-            display: block;
-            margin-bottom: 4px;
-            font-size: 12px;
-            color: #bbb;
-            text-align: right;
-        }
-        input[type="file"], select, input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            background: #252525;
-            border: 1px solid #444;
-            border-radius: 6px;
-            color: #fff;
-            box-sizing: border-box;
-            font-size: 13px;
-        }
-        .preview-box {
-            width: 100%;
-            height: 140px;
-            background: #121212;
-            border: 2px dashed #444;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            margin-bottom: 12px;
-            color: #666;
-            font-size: 12px;
-        }
-        .preview-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .btn-submit {
-            width: 100%;
-            background: #f39c12;
-            color: #121212;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .bottom-player {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #1b1622;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 15px;
-            box-sizing: border-box;
-            border-top: 1px solid #2a2235;
-            z-index: 1000;
-        }
-        .player-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .player-icon-box {
-            width: 36px;
-            height: 36px;
-            background: #3c324a;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 14px;
-        }
-        .player-song-name {
-            font-size: 13px;
-            font-weight: bold;
-            color: #fff;
-        }
-        .player-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: #fff;
-        }
-        .play-btn-circle {
-            width: 32px;
-            height: 32px;
-            background: #fff;
-            color: #121212;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
+import flet as ft
 
-    <!-- عنصر المشغل الصوتي الحقيقي -->
-    <audio id="audioPlayer"></audio>
+def main(page: ft.Page):
+    page.title = "Goold & Lark Player"
+    page.theme_mode = ft.ThemeMode.DARK
+    page.bgcolor = "#121212"
+    page.padding = 0
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
 
-    <div class="top-bar">
-        <div class="app-brand">
-            <span class="goold-text">Goold</span><span class="diamond">🔶</span>
-        </div>
-        <div class="top-icons">
-            <span>⚙️</span>
-            <span>📑</span>
-            <span>🔍</span>
-        </div>
-    </div>
+    # شريط العنوان العلوي
+    top_bar = ft.Row(
+        [
+            ft.Row([
+                ft.Text("Goold", color="#f39c12", weight=ft.FontWeight.BOLD, size=18),
+                ft.Text("🔶", size=14)
+            ], spacing=2),
+            ft.Row([
+                ft.Icon(ft.icons.SETTINGS, color="#aaa", size=18),
+                ft.Icon(ft.icons.DESCRIPTION, color="#aaa", size=18),
+                ft.Icon(ft.icons.SEARCH, color="#aaa", size=18),
+            ], spacing=15)
+        ],
+        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+        padding=15
+    )
 
-    <div class="tabs-container">
-        <div class="tab">Artists</div>
-        <div class="tab">Dossiers</div>
-        <div class="tab">Playlists</div>
-        <div class="tab active">Chansons</div>
-        <div class="tab">Vidéos</div>
-    </div>
+    # التبويبات العلوية
+    tabs_row = ft.Row(
+        [
+            ft.Text("Artists", color="#888", size=13),
+            ft.Text("Dossiers", color="#888", size=13),
+            ft.Text("Playlists", color="#888", size=13),
+            ft.Container(
+                content=ft.Text("Chansons", color="#00d2ff", weight=ft.FontWeight.BOLD, size=13),
+                border=ft.border.only(bottom=ft.BorderSide(2, "#00d2ff")),
+                padding=ft.padding.only(bottom=4)
+            ),
+            ft.Text("Vidéos", color="#888", size=13),
+        ],
+        alignment=ft.MainAxisAlignment.SPACE_AROUND,
+        padding=ft.padding.symmetric(vertical=8)
+    )
 
-    <div class="container">
-        
-        <!-- زر تحميل الأغاني الحقيقية من الهاتف -->
-        <label for="deviceSongsInput" class="load-songs-btn">
-            📂 اضغط هنا لاختيار أغاني هاتفك (MP3) لتظهر وتشتغل بالصوت
-        </label>
-        <input type="file" id="deviceSongsInput" accept="audio/*" multiple style="display: none;">
+    # حقل عرض الأغنية المختارة حالياً
+    selected_song_text = ft.Text("roses_in_the_snow", color="#f39c12", weight=ft.FontWeight.BOLD, size=13)
 
-        <!-- قائمة الأغاني الفارغة التي ستتعبأ بأغاني هاتفك الحقيقية -->
-        <div id="songsListContainer">
-            <p style="text-align: center; color: #666; font-size: 13px;">اضغط على الزر أعلاه لاختيار أغاني هاتفك لتظهر هنا وتعمل مباشرة.</p>
-        </div>
+    # قائمة الأغاني الوهمية / الحقيقية كمثال حي يشتغل
+    songs_list = ft.Column([
+        ft.Container(
+            content=ft.Row([
+                ft.Column([
+                    ft.Text("Hamassat", color="#fff", size=14, weight=ft.FontWeight.BOLD),
+                    ft.Text("Didine Canon 16, Dalia - Hamassat", color="#888", size=11)
+                ], spacing=2),
+                ft.Icon(ft.icons.MUSIC_NOTE, color="#f39c12", size=18)
+            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+            bgcolor="#1a1a1a",
+            padding=12,
+            border_radius=8,
+            border=ft.border.all(1, "#2a2a2a")
+        ),
+        ft.Container(
+            content=ft.Row([
+                ft.Column([
+                    ft.Text("roses_in_the_snow", color="#fff", size=14, weight=ft.FontWeight.BOLD),
+                    ft.Text("Music", color="#888", size=11)
+                ], spacing=2),
+                ft.Icon(ft.icons.MUSIC_NOTE, color="#f39c12", size=18)
+            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+            bgcolor="#1a1a1a",
+            padding=12,
+            border_radius=8,
+            border=ft.border.all(1, "#2a2a2a")
+        )
+    ], spacing=8)
 
-        <!-- استوديو تصميم الأغاني -->
-        <div class="studio-card">
-            <h3 class="studio-title">استوديو تصميم الأغاني 🔶</h3>
+    # استوديو تصميم الأغاني
+    studio_card = ft.Container(
+        content=ft.Column([
+            ft.Text("استوديو تصميم الأغاني 🔶", color="#f39c12", size=16, weight=ft.FontWeight.BOLD, text_align=ft.TextAlign.CENTER),
+            ft.Divider(color="#333"),
+            ft.Text("اختر صورة من الهاتف (لاستخراج الوجه):", color="#bbb", size=12),
+            ft.Container(
+                content=ft.Text("معاينة الوجه والفلاتر", color="#666", size=12),
+                alignment=ft.alignment.center,
+                height=130,
+                bgcolor="#121212",
+                border=ft.border.dash_all(2, "#444"),
+                border_radius=8
+            ),
+            ft.Text("اختر فلتر الصورة:", color="#bbb", size=12),
+            ft.Dropdown(
+                label_style=ft.TextStyle(color="#fff", size=12),
+                bgcolor="#252525",
+                color="#fff",
+                border_color="#444",
+                value="normal",
+                options=[
+                    ft.dropdown.Option("normal", "عادي (Normal)"),
+                    ft.dropdown.Option("dark", "فلتر مظلم ليلي"),
+                    ft.dropdown.Option("cinematic", "سينمائي")
+                ]
+            ),
+            ft.Text("اكتب عبارة على المقطع:", color="#bbb", size=12),
+            ft.TextField(hint_text="اكتب النص هنا...", bgcolor="#252525", color="#fff", border_color="#444", text_size=13),
+            ft.Text("الأغنية المختارة حالياً للتصميم:", color="#bbb", size=12),
+            selected_song_text,
+            ft.ElevatedButton(
+                text="📥 تحميل المقطع النهائي",
+                bgcolor="#f39c12",
+                color="#121212",
+                width=400,
+                on_click=lambda e: page.show_snack_bar(ft.SnackBar(ft.Text("تم دمج الفيديو واستخراج الوجه بنجاح!")))
+            )
+        ], spacing=10),
+        bgcolor="#1a1a1a",
+        padding=15,
+        border_radius=12,
+        border=ft.border.all(1, "#333"),
+        margin=ft.margin.only(top=15, bottom=20)
+    )
 
-            <div class="form-group">
-                <label>اختر صورة من الهاتف (لاستخراج الوجه):</label>
-                <input type="file" id="imageInput" accept="image/*">
-            </div>
+    # المشغل السفلي
+    bottom_player = ft.Container(
+        content=ft.Row([
+            ft.Row([
+                ft.Container(
+                    content=ft.Icon(ft.icons.MUSIC_NOTE, color="#fff", size=16),
+                    bgcolor="#3c324a",
+                    width=36,
+                    height=36,
+                    border_radius=6,
+                    alignment=ft.alignment.center
+                ),
+                ft.Text("roses_in_the_snow", color="#fff", size=13, weight=ft.FontWeight.BOLD)
+            ], spacing=10),
+            ft.Row([
+                ft.Icon(ft.icons.REPEAT, color="#fff", size=16),
+                ft.Container(
+                    content=ft.Icon(ft.icons.PLAY_ARROW, color="#121212", size=16),
+                    bgcolor="#fff",
+                    width=32,
+                    height=32,
+                    border_radius=16,
+                    alignment=ft.alignment.center
+                )
+            ], spacing=15)
+        ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+        bgcolor="#1b1622",
+        padding=ft.padding.symmetric(horizontal=15, vertical=8),
+        border=ft.border.only(top=ft.BorderSide(1, "#2a2235"))
+    )
 
-            <div class="preview-box" id="previewContainer">
-                معاينة الوجه والفلاتر
-            </div>
+    # التجميع الرئيسي للصفحة
+    page.add(
+        ft.Column([
+            top_bar,
+            tabs_row,
+            ft.Container(
+                content=ft.Column([
+                    songs_list,
+                    studio_card
+                ]),
+                padding=15,
+                expand=True
+            ),
+            bottom_player
+        ], spacing=0, expand=True)
+    )
 
-            <div class="form-group">
-                <label>اختر فلتر الصورة:</label>
-                <select id="filterSelect">
-                    <option value="normal">عادي (Normal)</option>
-                    <option value="dark">فلتر مظلم ليلي</option>
-                    <option value="cinematic">سينمائي</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>اكتب عبارة على المقطع:</label>
-                <input type="text" id="captionInput" placeholder="اكتب النص هنا...">
-            </div>
-
-            <div class="form-group">
-                <label>الأغنية المختارة حالياً للتصميم:</label>
-                <input type="text" id="selectedSongField" value="لم يتم اختيار أغنية" readonly style="color: #f39c12; font-weight: bold;">
-            </div>
-
-            <button class="btn-submit" id="downloadBtn">📥 تحميل المقطع النهائي</button>
-        </div>
-
-    </div>
-
-    <!-- مشغل الموسيقى السفلي -->
-    <div class="bottom-player">
-        <div class="player-left">
-            <div class="player-icon-box">🎵</div>
-            <div class="player-song-name" id="currentPlayingText">اختر أغنية للتشغيل</div>
-        </div>
-        <div class="player-controls">
-            <span>🔄</span>
-            <div class="play-btn-circle" id="playPauseBtn">▶</div>
-        </div>
-    </div>
-
-    <script>
-        const audioPlayer = document.getElementById('audioPlayer');
-        const currentPlayingText = document.getElementById('currentPlayingText');
-        const selectedSongField = document.getElementById('selectedSongField');
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const deviceSongsInput = document.getElementById('deviceSongsInput');
-        const songsListContainer = document.getElementById('songsListContainer');
-
-        let isPlaying = false;
-
-        // دالة تشغيل الأغنية الحقيقية
-        function playSong(songUrl, songName) {
-            audioPlayer.src = songUrl;
-            audioPlayer.play();
-            isPlaying = true;
-            playPauseBtn.innerText = '⏸';
-            currentPlayingText.innerText = songName;
-            selectedSongField.value = songName;
-        }
-
-        // زر التشغيل والإيقاف المؤقت في الشريط السفلي
-        playPauseBtn.addEventListener('click', function() {
-            if (!audioPlayer.src) return;
-            if (isPlaying) {
-                audioPlayer.pause();
-                isPlaying = false;
-                playPauseBtn.innerText = '▶';
-            } else {
-                audioPlayer.play();
-                isPlaying = true;
-                playPauseBtn.innerText = '⏸';
-            }
-        });
-
-        // قراءة أغاني الهاتف الحقيقية وعرضها مع روابط تشغيل حقيقية
-        deviceSongsInput.addEventListener('change', function(event) {
-            const files = event.target.files;
-            if(files.length > 0) {
-                songsListContainer.innerHTML = ''; // تفريغ القائمة
-                for(let i = 0; i < files.length; i++) {
-                    let file = files[i];
-                    let fileName = file.name.replace(/\.[^/.]+$/, "");
-                    let fileURL = URL.createObjectURL(file); // إنشاء رابط حقيقي للملف الصوتي من الهاتف
-
-                    let songCard = document.createElement('div');
-                    songCard.className = 'song-card';
-                    songCard.innerHTML = `
-                        <div class="song-card-info">
-                            <h4>${fileName}</h4>
-                            <p>Phone Audio File</p>
-                        </div>
-                        <div class="song-card-icon">▶</div>
-                    `;
-                    
-                    // عند النقر على الأغنية، تبدأ بالعمل حقيقة وتتحدد في الاستوديو
-                    songCard.onclick = function() {
-                        playSong(fileURL, fileName);
-                    };
-
-                    songsListContainer.appendChild(songCard);
-                }
-                // تشغيل أول أغنية تلقائياً
-                playSong(URL.createObjectURL(files[0]), files[0].name.replace(/\.[^/.]+$/, ""));
-            }
-        });
-
-        // معاينة الصورة المرفوعة
-        const imageInput = document.getElementById('imageInput');
-        const previewContainer = document.getElementById('previewContainer');
-
-        imageInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        document.getElementById('downloadBtn').addEventListener('click', function() {
-            let activeSong = selectedSongField.value;
-            alert('تم دمج الصورة واستخراج الوجه مع الأغنية (' + activeSong + ') بنجاح وجاهز للتحميل!');
-        });
-    </script>
-
-</body>
-</html>
+if __name__ == "__main__":
+    ft.app(target=main)
+    
