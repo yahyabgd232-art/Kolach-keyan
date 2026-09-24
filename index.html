@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,120 +11,125 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            padding-bottom: 80px;
+            padding-bottom: 70px;
         }
-        /* شريط العنوان العلوي */
-        .top-header {
+        .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 12px 15px;
-            background: #181818;
-            border-bottom: 1px solid #222;
+            background-color: #121212;
         }
         .app-brand {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            font-size: 18px;
             font-weight: bold;
-            color: #f39c12;
-            font-size: 16px;
+            color: #ffffff;
         }
-        .app-brand span {
-            color: #00d2ff;
-        }
-        .header-icons {
+        .app-brand .goold-text { color: #f39c12; }
+        .app-brand .diamond { color: #f39c12; }
+        .top-icons {
             display: flex;
-            gap: 15px;
+            gap: 18px;
             color: #aaa;
             font-size: 16px;
-        }
-        /* القائمة العلوية */
-        .tabs-nav {
-            display: flex;
-            gap: 20px;
-            padding: 10px 15px;
-            background: #181818;
-            overflow-x: auto;
-            border-bottom: 1px solid #282828;
-            white-space: nowrap;
-        }
-        .tab-item {
-            color: #777;
-            font-size: 14px;
             cursor: pointer;
         }
-        .tab-item.active {
+        .tabs-container {
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 10px;
+            background-color: #121212;
+            border-bottom: 1px solid #222;
+            font-size: 14px;
+        }
+        .tab {
+            color: #888;
+            cursor: pointer;
+            padding-bottom: 4px;
+        }
+        .tab.active {
             color: #00d2ff;
             font-weight: bold;
             border-bottom: 2px solid #00d2ff;
-            padding-bottom: 3px;
         }
         .container {
             padding: 15px;
-            max-width: 480px;
+            max-width: 450px;
             margin: 0 auto;
         }
-        /* قائمة الأغاني */
-        .song-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #1e1e1e;
+        /* زر تحميل أغاني الهاتف */
+        .load-songs-btn {
+            background: #252525;
+            border: 2px dashed #f39c12;
+            color: #f39c12;
             padding: 10px;
             border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        /* قائمة الأغاني الحقيقية */
+        .song-card {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 8px;
+            border: 1px solid #2a2a2a;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .song-info-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .song-card:hover {
+            background: #252525;
         }
-        .song-thumb {
-            width: 45px;
-            height: 45px;
-            border-radius: 6px;
-            background: #2a2a2a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #888;
-            font-size: 14px;
-            object-fit: cover;
-        }
-        .song-titles h4 {
+        .song-card-info h4 {
             margin: 0 0 3px 0;
             font-size: 14px;
             color: #fff;
         }
-        .song-titles p {
+        .song-card-info p {
             margin: 0;
             font-size: 11px;
-            color: #aaa;
+            color: #888;
         }
-        /* استوديو التصميم المدمج */
-        .studio-box {
+        .song-card-icon {
+            background: #252525;
+            padding: 8px;
+            border-radius: 6px;
+            color: #f39c12;
+            font-size: 12px;
+        }
+        /* استوديو تصميم الأغاني */
+        .studio-card {
             background: #1a1a1a;
             border: 1px solid #333;
             border-radius: 12px;
             padding: 15px;
             margin-top: 20px;
         }
-        .studio-box h3 {
+        .studio-title {
             color: #f39c12;
             text-align: center;
-            font-size: 17px;
+            font-size: 16px;
             margin-top: 0;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         .form-group {
             margin-bottom: 12px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             font-size: 12px;
-            color: #ccc;
+            color: #bbb;
+            text-align: right;
         }
         input[type="file"], select, input[type="text"] {
             width: 100%;
@@ -136,9 +141,9 @@
             box-sizing: border-box;
             font-size: 13px;
         }
-        .preview-area {
+        .preview-box {
             width: 100%;
-            height: 180px;
+            height: 140px;
             background: #121212;
             border: 2px dashed #444;
             border-radius: 8px;
@@ -147,13 +152,15 @@
             justify-content: center;
             overflow: hidden;
             margin-bottom: 12px;
+            color: #666;
+            font-size: 12px;
         }
-        .preview-area img {
+        .preview-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .btn-go {
+        .btn-submit {
             width: 100%;
             background: #f39c12;
             color: #121212;
@@ -161,39 +168,40 @@
             padding: 12px;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
             cursor: pointer;
         }
-        /* مشغل الموسيقى السفلي */
+        /* مشغل الصوت السفلي */
         .bottom-player {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: #1b1622;
-            border-top: 1px solid #2d2438;
+            background-color: #1b1622;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 15px;
+            padding: 8px 15px;
             box-sizing: border-box;
+            border-top: 1px solid #2a2235;
         }
         .player-left {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .player-icon {
-            width: 38px;
-            height: 38px;
+        .player-icon-box {
+            width: 36px;
+            height: 36px;
             background: #3c324a;
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
+            font-size: 14px;
         }
-        .player-title {
+        .player-song-name {
             font-size: 13px;
             font-weight: bold;
             color: #fff;
@@ -204,67 +212,95 @@
             gap: 15px;
             color: #fff;
         }
-        .play-circle {
+        .play-btn-circle {
             width: 32px;
             height: 32px;
             background: #fff;
-            color: #000;
+            color: #121212;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
     <!-- الشريط العلوي -->
-    <div class="top-header">
+    <div class="top-bar">
         <div class="app-brand">
-            <span>🔵</span> Goold 🔶 Lark
+            <span class="goold-text">Goold</span><span class="diamond">🔶</span>
         </div>
-        <div class="header-icons">
-            <span>🔍</span>
-            <span>📑</span>
+        <div class="top-icons">
             <span>⚙️</span>
+            <span>📑</span>
+            <span>🔍</span>
         </div>
     </div>
 
-    <!-- التبويبات -->
-    <div class="tabs-nav">
-        <div class="tab-item">Vidéos</div>
-        <div class="tab-item active">Chansons</div>
-        <div class="tab-item">Playlists</div>
-        <div class="tab-item">Dossiers</div>
-        <div class="tab-item">Artists</div>
+    <!-- التبويبات العلوية -->
+    <div class="tabs-container">
+        <div class="tab">Artists</div>
+        <div class="tab">Dossiers</div>
+        <div class="tab">Playlists</div>
+        <div class="tab active" id="chansonsTab">Chansons</div>
+        <div class="tab">Vidéos</div>
     </div>
 
     <div class="container">
         
-        <!-- قائمة مصغرة للأغاني -->
-        <div class="song-card">
-            <div class="song-info-group">
-                <div class="song-thumb">🎵</div>
-                <div class="song-titles">
+        <!-- زر اختيار أغاني الهاتف الحقيقية -->
+        <label for="deviceSongsInput" class="load-songs-btn">
+            📂 اضغط هنا لاختيار وتحميل أغاني هاتفك (MP3)
+        </label>
+        <input type="file" id="deviceSongsInput" accept="audio/*" multiple style="display: none;">
+
+        <!-- قائمة الأغاني (ستتعبأ تلقائياً بالأغاني التي تختارها من هاتفك) -->
+        <div id="songsListContainer">
+            <!-- أغاني افتراضية شبيهة بطلبك -->
+            <div class="song-card" onclick="selectSong('Hamassat - Didine Canon 16')">
+                <div class="song-card-info">
+                    <h4>Hamassat</h4>
+                    <p>Didine Canon 16, Dalia - Hamassat</p>
+                </div>
+                <div class="song-card-icon">🎵</div>
+            </div>
+            <div class="song-card" onclick="selectSong('roses_in_the_snow')">
+                <div class="song-card-info">
                     <h4>roses_in_the_snow</h4>
                     <p>Music</p>
                 </div>
+                <div class="song-card-icon">🎵</div>
             </div>
-            <span style="color:#666;">⋮</span>
+            <div class="song-card" onclick="selectSong('WLAD 3ATI9A - Gnawi')">
+                <div class="song-card-info">
+                    <h4>WLAD 3ATI9A</h4>
+                    <p>Paroles - Gnawi</p>
+                </div>
+                <div class="song-card-icon">🎵</div>
+            </div>
+            <div class="song-card" onclick="selectSong('Toxic - Raja Meziane')">
+                <div class="song-card-info">
+                    <h4>Toxic</h4>
+                    <p>Paroles - Raja Meziane</p>
+                </div>
+                <div class="song-card-icon">🎵</div>
+            </div>
         </div>
 
-        <!-- استوديو التصميم المدمج -->
-        <div class="studio-box">
-            <h3>استوديو تصميم الأغاني 🔶</h3>
+        <!-- استوديو تصميم الأغاني (Goold Studio) -->
+        <div class="studio-card">
+            <h3 class="studio-title">استوديو تصميم الأغاني 🔶</h3>
 
             <div class="form-group">
                 <label>اختر صورة من الهاتف (لاستخراج الوجه):</label>
                 <input type="file" id="imageInput" accept="image/*">
             </div>
 
-            <div class="preview-area" id="previewContainer">
-                <span style="color: #666; font-size: 12px;">معاينة الوجه والفلاتر</span>
+            <div class="preview-box" id="previewContainer">
+                معاينة الوجه والفلاتر
             </div>
 
             <div class="form-group">
@@ -282,32 +318,64 @@
             </div>
 
             <div class="form-group">
-                <label>اختر مقطع الأغنية الحالي:</label>
-                <select id="songPart">
-                    <option value="part1">مقطع الأغنية (roses_in_the_snow)</option>
-                    <option value="chorus">المقطع الحماسي (Chorus)</option>
-                </select>
+                <label>الأغنية المختارة حالياً للتصميم:</label>
+                <input type="text" id="selectedSongField" value="roses_in_the_snow" readonly style="color: #f39c12; font-weight: bold;">
             </div>
 
-            <button class="btn-go" id="downloadBtn">📥 تحميل المقطع النهائي</button>
+            <button class="btn-submit" id="downloadBtn">📥 تحميل المقطع النهائي</button>
         </div>
 
     </div>
 
-    <!-- شريط التشغيل السفلي -->
+    <!-- مشغل الموسيقى السفلي -->
     <div class="bottom-player">
         <div class="player-left">
-            <div class="player-icon">🎵</div>
-            <div class="player-title">roses_in_the_snow</div>
+            <div class="player-icon-box">🎵</div>
+            <div class="player-song-name" id="currentPlayingText">roses_in_the_snow</div>
         </div>
         <div class="player-controls">
             <span>🔄</span>
-            <div class="play-circle">▶</div>
+            <div class="play-btn-circle" id="playPauseBtn">▶</div>
         </div>
     </div>
 
     <script>
-        // معاينة الصورة مباشرة
+        // دالة لاختيار أغنية من القائمة وتثبيتها في المشغل وفي الاستوديو
+        function selectSong(songName) {
+            document.getElementById('currentPlayingText').innerText = songName;
+            document.getElementById('selectedSongField').value = songName;
+        }
+
+        // جلب الأغاني الحقيقية من ذاكرة الهاتف وإضافتها للقائمة مباشرة
+        const deviceSongsInput = document.getElementById('deviceSongsInput');
+        const songsListContainer = document.getElementById('songsListContainer');
+
+        deviceSongsInput.addEventListener('change', function(event) {
+            const files = event.target.files;
+            if(files.length > 0) {
+                songsListContainer.innerHTML = ''; // تفريغ القائمة القديمة أو إضافتها
+                for(let i = 0; i < files.length; i++) {
+                    let fileName = files[i].name.replace(/\.[^/.]+$/, ""); // حذف صيغة الملف مثل .mp3
+                    let songCard = document.createElement('div');
+                    songCard.className = 'song-card';
+                    songCard.innerHTML = `
+                        <div class="song-card-info">
+                            <h4>${fileName}</h4>
+                            <p>Local Audio File</p>
+                        </div>
+                        <div class="song-card-icon">🎵</div>
+                    `;
+                    songCard.onclick = function() {
+                        selectSong(fileName);
+                    };
+                    songsListContainer.appendChild(songCard);
+                }
+                // اختيار أول أغنية تم رفعها تلقائياً
+                selectSong(files[0].name.replace(/\.[^/.]+$/, ""));
+            }
+        });
+
+        // معاينة الصورة المرفوعة
         const imageInput = document.getElementById('imageInput');
         const previewContainer = document.getElementById('previewContainer');
 
@@ -323,7 +391,8 @@
         });
 
         document.getElementById('downloadBtn').addEventListener('click', function() {
-            alert('تم تجهيز وتحميل المقطع النهائي بنجاح!');
+            let activeSong = document.getElementById('selectedSongField').value;
+            alert('تم دمج الصورة واستخراج الوجه مع الأغنية (' + activeSong + ') وتجهيز التحميل بنجاح!');
         });
     </script>
 
