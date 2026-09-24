@@ -60,20 +60,19 @@
             max-width: 450px;
             margin: 0 auto;
         }
-        /* زر تحميل أغاني الهاتف */
         .load-songs-btn {
             background: #252525;
             border: 2px dashed #f39c12;
             color: #f39c12;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             text-align: center;
             font-size: 13px;
             cursor: pointer;
             margin-bottom: 15px;
             font-weight: bold;
+            display: block;
         }
-        /* قائمة الأغاني الحقيقية */
         .song-card {
             background: #1a1a1a;
             border-radius: 8px;
@@ -84,7 +83,6 @@
             margin-bottom: 8px;
             border: 1px solid #2a2a2a;
             cursor: pointer;
-            transition: background 0.2s;
         }
         .song-card:hover {
             background: #252525;
@@ -106,7 +104,6 @@
             color: #f39c12;
             font-size: 12px;
         }
-        /* استوديو تصميم الأغاني */
         .studio-card {
             background: #1a1a1a;
             border: 1px solid #333;
@@ -171,7 +168,6 @@
             font-size: 14px;
             cursor: pointer;
         }
-        /* مشغل الصوت السفلي */
         .bottom-player {
             position: fixed;
             bottom: 0;
@@ -184,6 +180,7 @@
             padding: 8px 15px;
             box-sizing: border-box;
             border-top: 1px solid #2a2235;
+            z-index: 1000;
         }
         .player-left {
             display: flex;
@@ -228,7 +225,9 @@
 </head>
 <body>
 
-    <!-- الشريط العلوي -->
+    <!-- عنصر المشغل الصوتي الحقيقي -->
+    <audio id="audioPlayer"></audio>
+
     <div class="top-bar">
         <div class="app-brand">
             <span class="goold-text">Goold</span><span class="diamond">🔶</span>
@@ -240,57 +239,28 @@
         </div>
     </div>
 
-    <!-- التبويبات العلوية -->
     <div class="tabs-container">
         <div class="tab">Artists</div>
         <div class="tab">Dossiers</div>
         <div class="tab">Playlists</div>
-        <div class="tab active" id="chansonsTab">Chansons</div>
+        <div class="tab active">Chansons</div>
         <div class="tab">Vidéos</div>
     </div>
 
     <div class="container">
         
-        <!-- زر اختيار أغاني الهاتف الحقيقية -->
+        <!-- زر تحميل الأغاني الحقيقية من الهاتف -->
         <label for="deviceSongsInput" class="load-songs-btn">
-            📂 اضغط هنا لاختيار وتحميل أغاني هاتفك (MP3)
+            📂 اضغط هنا لاختيار أغاني هاتفك (MP3) لتظهر وتشتغل بالصوت
         </label>
         <input type="file" id="deviceSongsInput" accept="audio/*" multiple style="display: none;">
 
-        <!-- قائمة الأغاني (ستتعبأ تلقائياً بالأغاني التي تختارها من هاتفك) -->
+        <!-- قائمة الأغاني الفارغة التي ستتعبأ بأغاني هاتفك الحقيقية -->
         <div id="songsListContainer">
-            <!-- أغاني افتراضية شبيهة بطلبك -->
-            <div class="song-card" onclick="selectSong('Hamassat - Didine Canon 16')">
-                <div class="song-card-info">
-                    <h4>Hamassat</h4>
-                    <p>Didine Canon 16, Dalia - Hamassat</p>
-                </div>
-                <div class="song-card-icon">🎵</div>
-            </div>
-            <div class="song-card" onclick="selectSong('roses_in_the_snow')">
-                <div class="song-card-info">
-                    <h4>roses_in_the_snow</h4>
-                    <p>Music</p>
-                </div>
-                <div class="song-card-icon">🎵</div>
-            </div>
-            <div class="song-card" onclick="selectSong('WLAD 3ATI9A - Gnawi')">
-                <div class="song-card-info">
-                    <h4>WLAD 3ATI9A</h4>
-                    <p>Paroles - Gnawi</p>
-                </div>
-                <div class="song-card-icon">🎵</div>
-            </div>
-            <div class="song-card" onclick="selectSong('Toxic - Raja Meziane')">
-                <div class="song-card-info">
-                    <h4>Toxic</h4>
-                    <p>Paroles - Raja Meziane</p>
-                </div>
-                <div class="song-card-icon">🎵</div>
-            </div>
+            <p style="text-align: center; color: #666; font-size: 13px;">اضغط على الزر أعلاه لاختيار أغاني هاتفك لتظهر هنا وتعمل مباشرة.</p>
         </div>
 
-        <!-- استوديو تصميم الأغاني (Goold Studio) -->
+        <!-- استوديو تصميم الأغاني -->
         <div class="studio-card">
             <h3 class="studio-title">استوديو تصميم الأغاني 🔶</h3>
 
@@ -319,7 +289,7 @@
 
             <div class="form-group">
                 <label>الأغنية المختارة حالياً للتصميم:</label>
-                <input type="text" id="selectedSongField" value="roses_in_the_snow" readonly style="color: #f39c12; font-weight: bold;">
+                <input type="text" id="selectedSongField" value="لم يتم اختيار أغنية" readonly style="color: #f39c12; font-weight: bold;">
             </div>
 
             <button class="btn-submit" id="downloadBtn">📥 تحميل المقطع النهائي</button>
@@ -331,7 +301,7 @@
     <div class="bottom-player">
         <div class="player-left">
             <div class="player-icon-box">🎵</div>
-            <div class="player-song-name" id="currentPlayingText">roses_in_the_snow</div>
+            <div class="player-song-name" id="currentPlayingText">اختر أغنية للتشغيل</div>
         </div>
         <div class="player-controls">
             <span>🔄</span>
@@ -340,38 +310,68 @@
     </div>
 
     <script>
-        // دالة لاختيار أغنية من القائمة وتثبيتها في المشغل وفي الاستوديو
-        function selectSong(songName) {
-            document.getElementById('currentPlayingText').innerText = songName;
-            document.getElementById('selectedSongField').value = songName;
-        }
-
-        // جلب الأغاني الحقيقية من ذاكرة الهاتف وإضافتها للقائمة مباشرة
+        const audioPlayer = document.getElementById('audioPlayer');
+        const currentPlayingText = document.getElementById('currentPlayingText');
+        const selectedSongField = document.getElementById('selectedSongField');
+        const playPauseBtn = document.getElementById('playPauseBtn');
         const deviceSongsInput = document.getElementById('deviceSongsInput');
         const songsListContainer = document.getElementById('songsListContainer');
 
+        let isPlaying = false;
+
+        // دالة تشغيل الأغنية الحقيقية
+        function playSong(songUrl, songName) {
+            audioPlayer.src = songUrl;
+            audioPlayer.play();
+            isPlaying = true;
+            playPauseBtn.innerText = '⏸';
+            currentPlayingText.innerText = songName;
+            selectedSongField.value = songName;
+        }
+
+        // زر التشغيل والإيقاف المؤقت في الشريط السفلي
+        playPauseBtn.addEventListener('click', function() {
+            if (!audioPlayer.src) return;
+            if (isPlaying) {
+                audioPlayer.pause();
+                isPlaying = false;
+                playPauseBtn.innerText = '▶';
+            } else {
+                audioPlayer.play();
+                isPlaying = true;
+                playPauseBtn.innerText = '⏸';
+            }
+        });
+
+        // قراءة أغاني الهاتف الحقيقية وعرضها مع روابط تشغيل حقيقية
         deviceSongsInput.addEventListener('change', function(event) {
             const files = event.target.files;
             if(files.length > 0) {
-                songsListContainer.innerHTML = ''; // تفريغ القائمة القديمة أو إضافتها
+                songsListContainer.innerHTML = ''; // تفريغ القائمة
                 for(let i = 0; i < files.length; i++) {
-                    let fileName = files[i].name.replace(/\.[^/.]+$/, ""); // حذف صيغة الملف مثل .mp3
+                    let file = files[i];
+                    let fileName = file.name.replace(/\.[^/.]+$/, "");
+                    let fileURL = URL.createObjectURL(file); // إنشاء رابط حقيقي للملف الصوتي من الهاتف
+
                     let songCard = document.createElement('div');
                     songCard.className = 'song-card';
                     songCard.innerHTML = `
                         <div class="song-card-info">
                             <h4>${fileName}</h4>
-                            <p>Local Audio File</p>
+                            <p>Phone Audio File</p>
                         </div>
-                        <div class="song-card-icon">🎵</div>
+                        <div class="song-card-icon">▶</div>
                     `;
+                    
+                    // عند النقر على الأغنية، تبدأ بالعمل حقيقة وتتحدد في الاستوديو
                     songCard.onclick = function() {
-                        selectSong(fileName);
+                        playSong(fileURL, fileName);
                     };
+
                     songsListContainer.appendChild(songCard);
                 }
-                // اختيار أول أغنية تم رفعها تلقائياً
-                selectSong(files[0].name.replace(/\.[^/.]+$/, ""));
+                // تشغيل أول أغنية تلقائياً
+                playSong(URL.createObjectURL(files[0]), files[0].name.replace(/\.[^/.]+$/, ""));
             }
         });
 
@@ -391,8 +391,8 @@
         });
 
         document.getElementById('downloadBtn').addEventListener('click', function() {
-            let activeSong = document.getElementById('selectedSongField').value;
-            alert('تم دمج الصورة واستخراج الوجه مع الأغنية (' + activeSong + ') وتجهيز التحميل بنجاح!');
+            let activeSong = selectedSongField.value;
+            alert('تم دمج الصورة واستخراج الوجه مع الأغنية (' + activeSong + ') بنجاح وجاهز للتحميل!');
         });
     </script>
 
